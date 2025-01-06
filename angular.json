@@ -46,10 +46,13 @@
               "node_modules/admin-lte/plugins/summernote/summernote-bs4.min.css",
               "node_modules/admin-lte/plugins/icheck-bootstrap/icheck-bootstrap.min.css",
               "node_modules/admin-lte/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css",
-              "node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.min.css"
+              "node_modules/tempusdominus-bootstrap-4/build/css/tempusdominus-bootstrap-4.min.css",
+              "node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css"
             ],
             "scripts": [
               "node_modules/admin-lte/plugins/jquery/jquery.min.js",
+              "node_modules/datatables.net/js/dataTables.min.js",
+              "node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js",
               "node_modules/select2/dist/js/select2.min.js",
               "node_modules/admin-lte/plugins/jquery-ui/jquery-ui.min.js",
               "node_modules/admin-lte/plugins/bootstrap/js/bootstrap.bundle.min.js",
@@ -67,6 +70,7 @@
               "node_modules/admin-lte/dist/js/adminlte.js",
               "node_modules/admin-lte/dist/js/pages/dashboard.js",
               "node_modules/tempusdominus-bootstrap-4/build/js/tempusdominus-bootstrap-4.min.js"
+
             ]
           },
           "configurations": {

@@ -22,6 +22,16 @@ export class AppointmentComponent implements AfterViewInit {
     'Dr. Linda Martinez'
   ];
 
+  services = [
+    'Exodontia',
+    'Prosthodontics Treatment',
+    'Oral Prophylaxis',
+    'Orthodontic Treatment',
+    'Oral Surgery',
+    'Cosmetic Dentistry',
+    'Restorative Treatment'
+  ];
+
   selectedDentist: string = this.dentists[0];
 
   ngAfterViewInit(): void {
