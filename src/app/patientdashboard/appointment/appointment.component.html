@@ -1,0 +1,53 @@
+<section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+        
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="col-md-8">
+    <div class="card card-default">
+      <div class="card-header">
+        <h3 class="card-title">
+          Set an Appointment
+        </h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body">
+        <div class="callout callout-danger">
+          <h5>Please be advised that this is not yet a confirmed appointment.
+            Our Clinic will email or call you to send your schedule.</h5>
+        </div>
+        <p>
+            Due to the COVID-19 pandemic, we are strictly by appointment only until further notice. Please do not schedule an
+            appointment if you have signs or symptoms of COVID-19. Wearing a face mask is a must to ensure the safety of Doctors and
+            Patients. We will confirm your appointment via email or call 2 to 3 days before your appointment date.
+            
+            This questionnaire is designed with your safety in mind and must be answered honestly. Your answers will be reviewed
+            prior to your appointment, and a member of our team will contact you if we recommend rescheduling to a later date. An
+            answer of YES does not exclude you from treatment. Please answer YES or NO to each of the following questions. Thank you
+            for your consideration and understanding. 
+        </p>
+
+        <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Preferred Dentist</label>
+                <select class="form-control select2" style="width: 100%;">
+                  <option *ngFor="let dentist of dentists" [value]="dentist">{{ dentist }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+      <!-- /.card-body -->
+    </div>
+    
+    <!-- /.card -->
+  </div>
