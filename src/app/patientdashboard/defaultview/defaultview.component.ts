@@ -18,9 +18,19 @@ export class DefaultviewComponent {
     phone: '+1234567890',
     address: '123 Main St, Anytown, USA'
   };
+
+  appointmentData = {
+    date: '2021-12-31',
+    time: '09:00 AM',
+    status: 'pending'
+  }
   constructor(private router: Router) {}
 
   navigateToAppointment(): void {
     this.router.navigate(['/patientdashboard/appointment']);
+  }
+
+  cancelAppointment(): void {
+    this.appointmentData.status = 'cancelled';
   }
 }

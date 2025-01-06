@@ -1,6 +1,8 @@
 import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import 'select2'; // Import Select2 jQuery plugin
+import * as moment from 'moment';
+declare var $: any;
 
 @Component({
   selector: 'app-appointment',
@@ -26,6 +28,27 @@ export class AppointmentComponent implements AfterViewInit {
     ($('.select2') as any).select2();
     $('.select2').on('change', (event: any) => {
       this.onDentistChange(event.target.value);
+    });
+
+    $('#reservationdate').datetimepicker({
+      format: 'L',
+      defaultDate: new Date() // Set default date to today
+    });
+
+    $('#timepicker').datetimepicker({
+      format: 'LT', // Localized Time format
+      defaultDate: moment(),
+      icons: {
+        time: 'fa fa-clock',
+        date: 'fa fa-calendar',
+        up: 'fa fa-chevron-up',
+        down: 'fa fa-chevron-down',
+        previous: 'fa fa-chevron-left',
+        next: 'fa fa-chevron-right',
+        today: 'fa fa-calendar-check',
+        clear: 'fa fa-trash',
+        close: 'fa fa-times'
+      }
     });
   }
 

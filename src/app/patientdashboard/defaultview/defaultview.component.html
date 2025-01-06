@@ -64,8 +64,43 @@
                       <i class="fa fa-plus-circle"></i> Request an Appointment
                     </button>
                   </div>
+                    <div class="col-md-8">
+                    <h2>Your Appointment Details</h2>
+                    <div class="row">
+                      <div class="col-md-6">
+                      <b>Date:</b>
+                      </div>
+                      <div class="col-md-6">
+                      <span>{{appointmentData.date}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                      <b>Time:</b>
+                      </div>
+                      <div class="col-md-6">
+                      <span>{{appointmentData.time}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                      <b>Status:</b>
+                      </div>
+                      <div class="col-md-6">
+                      <span class="badge badge-warning">{{appointmentData.status}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                      </div>
+                      <div class="col-md-5">
+                        <button type="button" class="btn btn-danger btn-block" (click)="cancelAppointment()">
+                          <i class="fa fa-times-circle"></i> Cancel Appointment
+                        </button>
+                        </div>
+                    </div>
+                    </div>
                 </div>
-                <div class="post clearfix"></div>
               </div>
               <div class="tab-pane" id="settings"></div>
             </div>
