@@ -1,0 +1,112 @@
+<section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>Profile</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active">User Profile</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="card card-primary card-outline">
+          <div class="card-body box-profile">
+            <ul class="list-group list-group-unbordered mb-3">
+              <li class="list-group-item">
+                <b class="patientinfo">Patient Info</b>
+              </li>
+            </ul>
+            <div class="text-center">
+              <img class="profile-user-img img-fluid img-circle" src="assets/img/user4-128x128.jpg" alt="User profile picture">
+            </div>
+            <h3 class="profile-username text-center">{{dummyData.name}}</h3>
+            <p class="text-muted text-center">{{dummyData.email}}</p>
+            <ul class="list-group list-group-unbordered mb-3">
+              <li class="list-group-item">
+                <b>Gender</b> <a class="float-right">{{dummyData.gender}}</a>
+              </li>
+              <li class="list-group-item">
+                <b>Birthdate</b> <a class="float-right">{{dummyData.birthdate}}</a>
+              </li>
+              <li class="list-group-item">
+                <b>Phone</b> <a class="float-right">{{dummyData.phone}}</a>
+              </li>
+              <li class="list-group-item">
+                <b>Address</b> <a class="float-right">{{dummyData.address}}</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-9">
+        <div class="card">
+          <div class="card-header p-2">
+            <ul class="nav nav-pills">
+              <li class="nav-item"><a class="nav-link active" href="#activity" data-toggle="tab">Activity</a></li>
+              <li class="nav-item"><a class="nav-link" href="#timeline" data-toggle="tab">Timeline</a></li>
+              <li class="nav-item"><a class="nav-link" href="#settings" data-toggle="tab">Settings</a></li>
+            </ul>
+          </div>
+          <div class="card-body">
+            <div class="tab-content">
+              <div class="active tab-pane" id="activity">
+                <div class="post">
+                  <div class="col-md-4 text-left">
+                    <button type="button" class="btn btn-outline-success" (click)="navigateToAppointment()">
+                      <i class="fa fa-plus-circle"></i> Request an Appointment
+                    </button>
+                  </div>
+                    <div class="col-md-8">
+                    <h2>Your Appointment Details</h2>
+                    <div class="row">
+                      <div class="col-md-6">
+                      <b>Date:</b>
+                      </div>
+                      <div class="col-md-6">
+                      <span>{{appointmentData.date}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                      <b>Time:</b>
+                      </div>
+                      <div class="col-md-6">
+                      <span>{{appointmentData.time}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                      <b>Status:</b>
+                      </div>
+                      <div class="col-md-6">
+                      <span class="badge badge-warning">{{appointmentData.status}}</span>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                      </div>
+                      <div class="col-md-5">
+                        <button type="button" class="btn btn-danger btn-block" (click)="cancelAppointment()">
+                          <i class="fa fa-times-circle"></i> Cancel Appointment
+                        </button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+              </div>
+              <div class="tab-pane" id="settings"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

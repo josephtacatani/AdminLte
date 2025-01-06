@@ -1,0 +1,119 @@
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+    <div class="content">
+      <div class="row">
+        <div class="col-lg-12 col-md-10 col-sm-8 ">
+          <div class="card card-primary card-outline">
+            <div class="card-body">
+              <h1 class="card-title">Somosot</h1>
+              <p class="card-text">
+                Create your account by filling the form below
+              </p>
+              <div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-group mb-3" >
+                            <input type="text" class="form-control" placeholder="First Name">
+                            <div class="input-group-append">
+                              <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                            </div>
+                          </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="input-group mb-3" >
+                            <input type="text" class="form-control" placeholder="Last Name">
+                            <div class="input-group-append">
+                              <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                            </div>
+                          </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                            <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate"/>
+                            <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <select class="form-control not-included">
+                              <option>Male</option>
+                              <option>Female</option>
+                            </select>
+                          </div>
+                    </div>
+                </div>
+
+
+
+                </div>
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Address">
+                <div class="input-group-append">
+                  <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                </div>
+              </div>
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Mobile Number">
+                <div class="input-group-append">
+                  <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                </div>
+              </div>
+              <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Email">
+                <div class="input-group-append">
+                  <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                </div>
+              </div>
+
+              <div class="input-group mb-3">
+                <input type="password" class="form-control" placeholder="Password" id="password" (input)="checkPasswordStrength()">
+                <div class="input-group-append">
+                  <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                </div>
+              </div>
+
+              <div class="progress">
+                <div class="progress-bar bg-danger progress-bar-striped" role="progressbar" id="password-strength-bar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+                  <span class="sr-only">0% Complete</span>
+                </div>
+              </div>
+              <ul class="password-criteria">
+                <li id="lowercase"><i class="fa fa-times text-danger"></i> Contains lowercase & uppercase</li>
+                <li id="number"><i class="fa fa-times text-danger"></i> Contain number (0-9)</li>
+                <li id="special"><i class="fa fa-times text-danger"></i> Contain special character (!#$%^&*)</li>
+                <li id="length"><i class="fa fa-times text-danger"></i> At least 8 characters</li>
+              </ul>
+
+              <div class="input-group mb-3">
+                <input type="password" class="form-control" placeholder="Confirm Password" id="password">
+                <div class="input-group-append">
+                  <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="customFile">Profile Picture</label>
+                <div class="input-group">
+                  <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="customFile" aria-describedby="customFileInput">
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                  </div>
+                </div>
+                <small class="form-text text-muted">No file chosen</small>
+              </div>
+
+
+
+              <button type="button" class="btn btn-block btn-primary">Register</button>
+              <div class="d-flex flex-column mt-3">
+                <a href="#" class="text-primary custom-link">I already have an account</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
