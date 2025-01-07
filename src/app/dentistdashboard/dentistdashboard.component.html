@@ -67,25 +67,25 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
             <a routerLink="/dentistdashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fa fa-home"></i>
               <p>Dashboard</p>
             </a>
           </li>
           <li class="nav-item">
             <a routerLink="/dentistdashboard/patients" routerLinkActive="active" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fa fa-user-plus"></i>
               <p>Patients</p>
             </a>
           </li>
           <li class="nav-item">
             <a routerLink="/dentistdashboard/schedule" routerLinkActive="active" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fa fa-calendar"></i>
               <p>Schedule</p>
             </a>
           </li>
           <li class="nav-item has-treeview" [routerLinkActive]="['menu-open', 'active']" #rla="routerLinkActive">
             <a href="#" class="nav-link" [ngClass]="{ active: rla.isActive }">
-              <i class="nav-icon fas fa-edit"></i>
+              <i class="nav-icon fa fa-list-ul"></i>
               <p>
                 Appointment
                 <i class="fas fa-angle-left right"></i>
@@ -116,19 +116,19 @@
           
           <li class="nav-item">
             <a routerLink="/dentistdashboard/prescription" routerLinkActive="active" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fa fa-tags"></i>
               <p>Prescription</p>
             </a>
           </li>
           <li class="nav-item">
             <a routerLink="/dentistdashboard/treatment" routerLinkActive="active" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fa fa-list-alt"></i>
               <p>Treatment</p>
             </a>
           </li>
           <li class="nav-item">
             <a routerLink="/dentistdashboard/dentistprofile" routerLinkActive="active" class="nav-link">
-              <i class="nav-icon fas fa-th"></i>
+              <i class="nav-icon fa fa-user"></i>
               <p>Profile</p>
             </a>
           </li>

@@ -14,7 +14,7 @@ export class DentistdashboardComponent {
     constructor(private router: Router) {}
     
   user = {
-    name: 'Taylor Swift',
+    name: 'Dr. Jane Doe',
     email: 'feliztoothdev@gmail.com',
   };
 
