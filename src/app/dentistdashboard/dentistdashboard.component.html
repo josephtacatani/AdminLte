@@ -63,24 +63,77 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
-      <!-- Sidebar Menu -->
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
-            <a routerLink="/patientdashboard" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-              <i class="nav-icon far fa-image"></i>
+            <a routerLink="/dentistdashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
               <p>Dashboard</p>
             </a>
           </li>
           <li class="nav-item">
-            <a routerLink="/patientdashboard/userprofile" routerLinkActive="active" class="nav-link">
-              <i class="nav-icon fas fa-user"></i>
-              <p>User Profile</p>
+            <a routerLink="/dentistdashboard/patients" routerLinkActive="active" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
+              <p>Patients</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/dentistdashboard/schedule" routerLinkActive="active" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
+              <p>Schedule</p>
+            </a>
+          </li>
+          <li class="nav-item has-treeview" [routerLinkActive]="['menu-open', 'active']" #rla="routerLinkActive">
+            <a href="#" class="nav-link" [ngClass]="{ active: rla.isActive }">
+              <i class="nav-icon fas fa-edit"></i>
+              <p>
+                Appointment
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a routerLink="/dentistdashboard/walkinrequest" routerLinkActive="active" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Walk-in Request</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a routerLink="/dentistdashboard/onlinerequest" routerLinkActive="active" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Online Request</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a routerLink="/dentistdashboard/calendar" routerLinkActive="active" class="nav-link">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Calendar</p>
+                </a>
+              </li>
+            </ul>
+          </li>
+          
+          
+          <li class="nav-item">
+            <a routerLink="/dentistdashboard/prescription" routerLinkActive="active" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
+              <p>Prescription</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/dentistdashboard/treatment" routerLinkActive="active" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
+              <p>Treatment</p>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a routerLink="/dentistdashboard/dentistprofile" routerLinkActive="active" class="nav-link">
+              <i class="nav-icon fas fa-th"></i>
+              <p>Profile</p>
             </a>
           </li>
         </ul>
       </nav>
-      
     </div>
   </aside>
 
@@ -105,6 +158,10 @@
 
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+
+
+    <!-- Main content -->
     <router-outlet></router-outlet>
   </div>
 

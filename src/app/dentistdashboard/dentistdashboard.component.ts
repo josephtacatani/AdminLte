@@ -4,25 +4,15 @@ import { FooterComponent } from "../footer/footer.component";
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 
 @Component({
-  selector: 'app-patientdashboard',
+  selector: 'app-dentistdashboard',
   standalone: true,
-  imports: [CommonModule, FooterComponent, RouterOutlet, RouterModule],
-  templateUrl: './patientdashboard.component.html',
-  styleUrls: ['./patientdashboard.component.scss']
+  imports: [CommonModule, FooterComponent, RouterModule, RouterOutlet],
+  templateUrl: './dentistdashboard.component.html',
+  styleUrls: ['./dentistdashboard.component.scss']
 })
-export class PatientdashboardComponent {
-
-  constructor(private router: Router) {}
-
-  PatientInfoDummyData = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    gender: 'Male',
-    birthdate: '1990-01-01',
-    phone: '+1234567890',
-    address: '123 Main St, Anytown, USA'
-  };
-
+export class DentistdashboardComponent {
+    constructor(private router: Router) {}
+    
   user = {
     name: 'Taylor Swift',
     email: 'feliztoothdev@gmail.com',
@@ -37,6 +27,4 @@ export class PatientdashboardComponent {
 
     this.router.navigate(['/login']);
   }
-
-  
 }

@@ -29,3 +29,7 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 mga i install nimo atay!!
 
 npm install datatables.net datatables.net-bs4 jquery
+
+//buttons
+npm install datatables.net-buttons datatables.net-buttons-bs4
+npm install --save-dev @types/datatables.net-buttons
