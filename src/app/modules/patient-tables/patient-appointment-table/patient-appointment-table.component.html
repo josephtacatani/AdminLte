@@ -1,0 +1,15 @@
+<section>
+    <app-display-table
+    [data]="filteredAppointmentDetails"
+    [columns]="columns"
+    [itemsPerPage]="itemsPerPage"
+    [(currentPage)]="currentPage"
+    [(searchTerm)]="searchTerm"
+    [pageSizeOptions]="[5, 10, 15, 20]"
+    [showAddButton]="false"
+    (searchTermChange)="filterAppointmentDetails($event)"
+    (currentPageChange)="currentPage = $event"
+    (sort)="sortAppointmentDetails($event)"
+  ></app-display-table>
+  </section>
+  

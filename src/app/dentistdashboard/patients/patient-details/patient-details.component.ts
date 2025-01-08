@@ -4,16 +4,20 @@ import 'datatables.net-bs4';
 declare var $: any;
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { AppointmentData, AppointmentDetail, DentalHistoryData, MedicalHistoryData, PatientData, PrescriptionData, TreatmentData } from 'src/app/model-interfaces/patients.interface';
+import { PatientTreatmentTableComponent } from 'src/app/modules/patient-tables/patient-treatment-table/patient-treatment-table.component';
+import { TableComponent } from 'src/app/ashared/table/table.component';
+import { PatientAppointmentTableComponent } from 'src/app/modules/patient-tables/patient-appointment-table/patient-appointment-table.component';
 
 @Component({
   selector: 'app-patient-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PatientAppointmentTableComponent, TableComponent],
   templateUrl: './patient-details.component.html',
   styleUrls: ['./patient-details.component.scss']
 })
 export class PatientDetailsComponent implements OnInit {
-  dummyData = {
+  patientData: PatientData = {
     name: 'John Doe',
     email: 'john.doe@example.com',
     gender: 'Male',
@@ -22,23 +26,23 @@ export class PatientDetailsComponent implements OnInit {
     address: '123 Main St, Anytown, USA'
   };
 
-  appointmentData = {
+  appointmentData: AppointmentData = {
     date: '2021-12-31',
     time: '09:00 AM',
     status: 'pending'
   };
 
-  tableData = [
+  appointmentDetails: AppointmentDetail[] = [
     { date: '2023-10-01', time: '10:00 AM', doctor: 'Dr. Jane Doe', status: 'Confirmed' },
     { date: '2023-10-02', time: '11:00 AM', doctor: 'Dr. Jane Doe', status: 'Pending' }
   ];
 
-  prescriptionData = [
+  prescriptionData: PrescriptionData[] = [
     { date: '2023-01-01', medicine: 'Medicine A', notes: 'Take twice daily' },
     { date: '2023-01-02', medicine: 'Medicine B', notes: 'Take once daily' }
   ];
 
-  treatmentData = [
+  treatmentData: TreatmentData[] = [
     {
       dateVisit: '2023-10-01',
       teethNos: '12, 14',
@@ -57,12 +61,12 @@ export class PatientDetailsComponent implements OnInit {
     }
   ];
 
-  dentalHistoryData = [
+  dentalHistoryData: DentalHistoryData[] = [
     { id: 1, previousDentist: 'Dr. John Smith', lastDentalVisit: '2022-12-01', action: 'View' },
     { id: 2, previousDentist: 'Dr. Jane Doe', lastDentalVisit: '2022-11-15', action: 'View' }
   ];
 
-  medicalHistoryData = [
+  medicalHistoryData: MedicalHistoryData[] = [
     { id: 1, allergies: 'Peanuts', illnesses: 'Asthma', action: 'View' },
     { id: 2, allergies: 'Penicillin', illnesses: 'Diabetes', action: 'View' }
   ];
@@ -73,11 +77,11 @@ export class PatientDetailsComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit(): void {
-    $('#example2').DataTable({
+    $('#patientappointment').DataTable({
       responsive: true,
       autoWidth: false,
       paging: true,
-      data: this.tableData,
+      data: this.appointmentDetails,
       columns: [
         { data: 'date' },
         { data: 'time' },

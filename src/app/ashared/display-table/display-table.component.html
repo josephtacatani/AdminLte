@@ -1,0 +1,94 @@
+
+      <div class="row mb-3">
+        <!-- Entries Per Page -->
+        <div class="col-md-6">
+          <label for="entriesPerPage">Show</label>
+          <select
+            id="entriesPerPage"
+            class="form-control d-inline-block w-auto ml-2"
+            [(ngModel)]="itemsPerPage"
+            (ngModelChange)="updatePageSize.emit(itemsPerPage)"
+          >
+            <option *ngFor="let option of pageSizeOptions" [value]="option">
+              {{ option }}
+            </option>
+          </select>
+          <span>entries</span>
+        </div>
+        <!-- Search Input -->
+        <div class="col-md-6 text-right">
+          <label for="searchBox">Search:</label>
+          <input
+            id="searchBox"
+            type="text"
+            class="form-control d-inline-block w-auto ml-2"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="search.emit(searchTerm)"
+            placeholder="Search..."
+          />
+        </div>
+      </div>
+  
+      <!-- Table -->
+      <table class="table table-bordered table-hover">
+        <thead>
+          <tr>
+            <!-- Render Table Headers -->
+            <th
+              *ngFor="let column of columns"
+              (click)="column.sortable && sort.emit(column.key)"
+              [class.sortable]="column.sortable"
+            >
+              {{ column.label }}
+              <i
+                *ngIf="column.sortable"
+                class="fas"
+                [ngClass]="{
+                  'fa-sort-up': sortColumn === column.key && sortDirection === 'asc',
+                  'fa-sort-down': sortColumn === column.key && sortDirection === 'desc',
+                  'fa-sort': sortColumn !== column.key
+                }"
+              ></i>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Render Table Rows -->
+          <tr *ngFor="let row of data | paginate: { itemsPerPage: itemsPerPage, currentPage: currentPage }">
+            <td *ngFor="let column of columns">
+              <!-- Render Action Column -->
+              <ng-container *ngIf="column.key === 'action'; else normalCell">
+                <button
+                  class="btn btn-info btn-sm"
+                  (click)="actionClick.emit({ action: 'view', row: row })"
+                >
+                  <i class="fas fa-eye"></i> View
+                </button>
+              </ng-container>
+              <!-- Render Normal Data Cell -->
+              <ng-template #normalCell>
+                {{ row[column.key] }}
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+  
+      <!-- Pagination Summary -->
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <span>
+            Showing {{ (currentPage - 1) * itemsPerPage + 1 }} to
+            {{ currentPage * itemsPerPage < data.length ? currentPage * itemsPerPage : data.length }}
+            of {{ data.length }} entries
+          </span>
+        </div>
+        <!-- Pagination Controls -->
+        <div class="col-md-6 d-flex justify-content-end">
+          <pagination-controls (pageChange)="currentPageChange.emit($event)"></pagination-controls>
+        </div>
+      </div>
+
+
+  

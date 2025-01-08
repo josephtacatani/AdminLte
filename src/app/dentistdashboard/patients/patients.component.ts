@@ -1,85 +1,92 @@
-import { AfterViewInit, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import * as $ from 'jquery';
-import 'datatables.net';
-import 'datatables.net-bs4';
-import 'datatables.net-buttons';
-import 'datatables.net-buttons-bs4';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { TableComponent } from 'src/app/ashared/table/table.component';
+import { Patient } from 'src/app/model-interfaces/patients.interface';
+
 
 @Component({
   selector: 'app-patients',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TableComponent],
   templateUrl: './patients.component.html',
   styleUrls: ['./patients.component.scss']
 })
-export class PatientsComponent implements AfterViewInit {
+export class PatientsComponent implements OnInit {
   pagetitle = 'Patients';
+  sortColumn: string = 'name'; // Default sort column
+sortDirection: string = 'asc'; // Default sort direction
 
-  patients = [
-    {
-      id: 101, // Dummy ID for Patient 1
-      photo: 'assets/img/patient1.jpg',
-      name: 'John Doe',
-      birthday: '1990-01-01',
-      gender: 'Male',
-      contact: '123-456-7890',
-      email: 'john.doe@example.com'
-    },
-    {
-      id: 102, // Dummy ID for Patient 2
-      photo: 'assets/img/patient2.jpg',
-      name: 'Jane Smith',
-      birthday: '1985-05-15',
-      gender: 'Female',
-      contact: '987-654-3210',
-      email: 'jane.smith@example.com'
-    }
+  originalPatients: Patient[] = [
+    { id: 101, photo: 'assets/img/patient1.jpg', name: 'John Doe', birthday: '1990-01-01', gender: 'Male', contact: '123-456-7890', email: 'john.doe@example.com' },
+    { id: 102, photo: 'assets/img/patient2.jpg', name: 'Jane Smith', birthday: '1985-05-15', gender: 'Female', contact: '987-654-3210', email: 'jane.smith@example.com' }
   ];
+
+  filteredPatients: Patient[] = [...this.originalPatients];
+
+  columns = [
+    { key: 'photo', label: 'Photo', render: (data: any) => `<img src="${data}" class="img-thumbnail" width="50" alt="Photo">`, sortable: false },
+    { key: 'name', label: 'Patient', sortable: true },
+    { key: 'birthday', label: 'Birthday', sortable: true },
+    { key: 'gender', label: 'Gender', sortable: true },
+    { key: 'contact', label: 'Contact', sortable: false },
+    { key: 'email', label: 'Email', sortable: true },
+    { key: 'action', label: 'Action', sortable: false }
+  ];
+
+  actions = [
+    { label: 'View', icon: 'fas fa-eye', callback: 'view' }
+  ];
+
+  itemsPerPage = 10;
+  searchTerm = '';
+  currentPage = 1;
 
   constructor(private router: Router) {}
 
-  ngAfterViewInit(): void {
-    $(document).ready(() => {
-      const table = $('#patientlist').DataTable({
-        autoWidth: false,
-        paging: true,
-        searching: true,
-        ordering: true,
-        info: true,
-        data: this.patients,
-        columns: [
-          { data: 'photo', render: (data: any) => `<img src="${data}" class="img-thumbnail" width="50">` },
-          { data: 'name' },
-          { data: 'birthday' },
-          { data: 'gender' },
-          { data: 'contact' },
-          { data: 'email' },
-          {
-            data: null,
-            render: (data: any, type: any, row: any) => {
-              // Attach dummy ID to the button
-              return `
-                <button class="btn btn-info btn-sm view-patient" data-id="${row.id}">
-                  <i class="fas fa-eye"></i> View
-                </button>`;
-            }
-          }
-        ]
-      });
+  ngOnInit(): void {
+    this.sortPatients(this.sortColumn);
+  }
+  filterPatients(search: string): void {
+    this.searchTerm = search;
+    this.filteredPatients = this.originalPatients.filter((patient) =>
+      Object.values(patient).join(' ').toLowerCase().includes(search.toLowerCase())
+    );
+  }
 
-      // Handle click event for the "View" button
-      $('#patientlist').on('click', '.view-patient', (event: any) => {
-        const patientId = $(event.currentTarget).data('id'); // Get dummy ID
-        this.navigateToPatientDetails(patientId);
-      });
+  sortPatients(column: string): void {
+    this.sortColumn = column;
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.filteredPatients.sort((a: any, b: any) => {
+      const valA = a[column]?.toString().toLowerCase() || '';
+      const valB = b[column]?.toString().toLowerCase() || '';
+      return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
   }
 
-  // Navigate to the Patient Details component
+
+  handleRowAction(rowData: any): void {
+    this.navigateToPatientDetails(rowData.id);
+  }
+
   navigateToPatientDetails(patientId: number): void {
     console.log('Navigating to patient with ID:', patientId);
     this.router.navigate([`/dentistdashboard/patients/patient-details`, patientId]);
+  }
+
+  handleActionClick(event: { action: string; row: any }): void {
+    if (event.action === 'view') {
+      this.navigateToPatientDetails(event.row.id);
+    }
+  }
+
+  openEditPatientModal(patientId: number): void {
+    console.log('Editing patient with ID:', patientId);
+    // Open edit modal logic here
+  }
+  
+  confirmDeletePatient(patientId: number): void {
+    console.log('Deleting patient with ID:', patientId);
+    // Confirm and delete logic here
   }
 }

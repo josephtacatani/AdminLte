@@ -1,50 +1,86 @@
-import { AfterViewInit, Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import * as $ from 'jquery';
-import 'datatables.net';
-import 'datatables.net-bs4';
-import 'datatables.net-buttons';
-import 'datatables.net-buttons-bs4';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { GeneralModalComponent } from 'src/app/modals/general-modal/general-modal.component';
+import { TableComponent } from 'src/app/ashared/table/table.component';
 
 @Component({
   selector: 'app-schedule',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, GeneralModalComponent, NgxPaginationModule, TableComponent],
   templateUrl: './schedule.component.html',
-  styleUrls: ['./schedule.component.scss']
+  styleUrls: ['./schedule.component.scss'],
 })
-export class ScheduleComponent implements AfterViewInit {
+export class ScheduleComponent implements OnInit {
   pagetitle = 'Schedule';
+  isAddScheduleModalVisible: boolean = false;
+  itemsPerPage: number = 10;
+  p: number = 1; // Current page number
+  searchTerm: string = '';
+  sortColumn: string = 'date';
+  sortDirection: string = 'asc';
 
-  schedules = [
-    { day: 'January 12, 2025', startTime: '09:00 AM', endTime: '05:00 PM', duration: '8 hours' },
-    { day: 'January 13, 2025', startTime: '09:00 AM', endTime: '05:00 PM', duration: '8 hours' },
-    { day: 'January 14, 2025', startTime: '09:00 AM', endTime: '05:00 PM', duration: '8 hours' },
-    { day: 'January 15, 2025', startTime: '09:00 AM', endTime: '05:00 PM', duration: '8 hours' },
-    { day: 'January 16, 2025', startTime: '09:00 AM', endTime: '05:00 PM', duration: '8 hours' }
+  originalSchedules = [
+    { date: '2025-01-12', startTime: '09:00 AM', endTime: '05:00 PM', duration: '8 hours' },
+    { date: '2025-01-13', startTime: '10:00 AM', endTime: '06:00 PM', duration: '8 hours' },
+    { date: '2025-01-14', startTime: '09:30 AM', endTime: '05:30 PM', duration: '8 hours' },
   ];
+  filteredSchedules = [...this.originalSchedules];
 
-  ngAfterViewInit(): void {
-    $(document).ready(() => {
-      $('#schedule').DataTable({
-        autoWidth: false,
-        paging: true,
-        searching: true,
-        ordering: true,
-        info: true,
-        data: this.schedules,
-        columns: [
-          { data: 'day' },
-          { data: 'startTime' },
-          { data: 'endTime' },
-          { data: 'duration' }
-        ]
-      });
+  ngOnInit(): void {}
+
+  openAddScheduleModal(): void {
+    this.isAddScheduleModalVisible = true;
+  }
+
+  closeAddScheduleModal(): void {
+    this.isAddScheduleModalVisible = false;
+  }
+
+  handleAddSchedule(schedule: any): void {
+    console.log('Schedule added:', schedule);
+    this.originalSchedules.push(schedule);
+    this.filteredSchedules = [...this.originalSchedules];
+  }
+
+  sortSchedules(column: string): void {
+    this.sortColumn = column;
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    this.filteredSchedules.sort((a: any, b: any) => {
+      const valA = a[column].toLowerCase();
+      const valB = b[column].toLowerCase();
+      return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
     });
   }
 
-  addSchedule(): void {
-    // Add your logic to add a new schedule
-    console.log('Add Schedule button clicked');
+  filterSchedules(search: string): void {
+    this.filteredSchedules = this.originalSchedules.filter((schedule) =>
+      Object.values(schedule)
+        .join(' ')
+        .toLowerCase()
+        .includes(search.toLowerCase())
+    );
   }
+
+  onItemsPerPageChange(items: number): void {
+    this.itemsPerPage = items;
+  }
+
+  onSearch(event: Event): void {
+    const input = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  
+    if (input === '') {
+      // Reset to original schedules if the input is empty
+      this.filteredSchedules = [...this.originalSchedules];
+    } else {
+      // Filter schedules based on input
+      this.filteredSchedules = this.originalSchedules.filter((schedule) =>
+        Object.values(schedule)
+          .join(' ')
+          .toLowerCase()
+          .includes(input)
+      );
+    }
+  }
+  
 }

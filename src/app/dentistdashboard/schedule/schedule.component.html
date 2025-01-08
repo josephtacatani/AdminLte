@@ -1,5 +1,3 @@
-<!-- this is for staff table add patient in the future nagkamali ako eh-->
-
 <section class="content-header">
   <div class="container-fluid">
     <div class="row mb-2">
@@ -15,85 +13,40 @@
     </div>
   </div>
 </section>
+
 <section>
   <div class="content">
     <div class="container-fluid">
       <div class="col-md-12">
-        <div class="card card-primary card-outline">
-          <div class="card-header">
-            <h3 class="card-title">{{ pagetitle }} List</h3>
-            <button type="button" class="btn btn-primary float-right" data-toggle="modal" data-target="#addScheduleModal">
-              <i class="fas fa-plus"></i> Add Schedule
-            </button>
-          </div>
-          <div class="card-body">
-            <table id="schedule" class="table table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th>Day</th>
-                  <th>Start Time</th>
-                  <th>End Time</th>
-                  <th>Duration</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let schedule of schedules">
-                  <td>{{ schedule.day }}</td>
-                  <td>{{ schedule.startTime }}</td>
-                  <td>{{ schedule.endTime }}</td>
-                  <td>{{ schedule.duration }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <app-table
+          [title]="pagetitle + ' List'"
+          [data]="filteredSchedules"
+          [columns]="[
+            { key: 'date', label: 'Day', sortable: true },
+            { key: 'startTime', label: 'Start Time', sortable: true },
+            { key: 'endTime', label: 'End Time', sortable: true },
+            { key: 'duration', label: 'Duration', sortable: true }
+          ]"
+          [pageSizeOptions]="[5, 10, 15, 20]"
+          [(itemsPerPage)]="itemsPerPage"
+          [(currentPage)]="p"
+          [(searchTerm)]="searchTerm"
+          [showAddButton]="true"
+          [addButtonText]="'Add Schedule'"
+          (sort)="sortSchedules($event)"
+          (add)="openAddScheduleModal()"
+          (itemsPerPageChange)="onItemsPerPageChange($event)"
+          (currentPageChange)="p = $event"
+          (searchTermChange)="filterSchedules($event)"
+        ></app-table>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Add Schedule Modal -->
-<div class="modal fade" id="addScheduleModal" tabindex="-1" role="dialog" aria-labelledby="addScheduleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="addScheduleModalLabel">Add Schedule</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="scheduleForm">
-          <div class="form-group">
-            <label for="scheduleDate">Date <span class="text-danger">*</span></label>
-            <input type="date" class="form-control" id="scheduleDate" name="scheduleDate" required>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-6">
-              <label for="appointmentStartTime">Start Time <span class="text-danger">*</span></label>
-              <input type="time" class="form-control" id="appointmentStartTime" name="appointmentStartTime" required>
-            </div>
-            <div class="form-group col-md-6">
-              <label for="appointmentEndTime">End Time <span class="text-danger">*</span></label>
-              <input type="time" class="form-control" id="appointmentEndTime" name="appointmentEndTime" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="appointmentDuration">Duration <span class="text-danger">*</span></label>
-            <select class="form-control" id="appointmentDuration" name="appointmentDuration" required>
-              <option value="" disabled selected>Select Duration</option>
-              <option value="15">15 minutes</option>
-              <option value="30">30 minutes</option>
-              <option value="45">45 minutes</option>
-              <option value="60">1 hour</option>
-            </select>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="submitSchedule">Submit</button>
-      </div>
-    </div>
-  </div>
-</div>
+<app-general-modal
+  [isVisible]="isAddScheduleModalVisible"
+  [title]="'Add Schedule'"
+  (closeModal)="closeAddScheduleModal()"
+  (submitModal)="handleAddSchedule($event)"
+></app-general-modal>
