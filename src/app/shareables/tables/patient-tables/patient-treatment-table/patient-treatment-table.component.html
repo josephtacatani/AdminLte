@@ -1,0 +1,15 @@
+<section>
+    <app-display-table
+    [data]="filteredtreatmentData"
+    [columns]="columns"
+    [itemsPerPage]="itemsPerPage"
+    [(currentPage)]="currentPage"
+    [(searchTerm)]="searchTerm"
+    [pageSizeOptions]="[5, 10, 15, 20]"
+    [showAddButton]="false"
+    (searchTermChange)="filtertreatmentData($event)"
+    (currentPageChange)="currentPage = $event"
+    (sort)="sorttreatmentData($event)"
+  ></app-display-table>
+  </section>
+  

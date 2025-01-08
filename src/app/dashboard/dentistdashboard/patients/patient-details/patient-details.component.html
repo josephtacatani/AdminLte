@@ -1,0 +1,131 @@
+<section>
+  <div class="row">
+    <div class="col-12 col-sm-6 col-md-12">
+      <div class="card card-primary card-outline card-tabs">
+        <div class="card-header p-0 pt-1 border-bottom-0">
+          <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="overview-tab" data-toggle="pill" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Overview</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="medical-history-tab" data-toggle="pill" href="#medical-history" role="tab" aria-controls="medical-history" aria-selected="false">Medical History</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="treatment-tab" data-toggle="pill" href="#treatment" role="tab" aria-controls="treatment" aria-selected="false">Treatment</a>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <div class="tab-content" id="custom-tabs-three-tabContent">
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
+              <div class="row">
+                <!-- Patient Info Section -->
+                <div class="col-md-3">
+                  <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                      <div class="text-center">
+                        <img class="profile-user-img img-fluid img-circle" src="assets/img/user4-128x128.jpg" alt="User profile picture">
+                      </div>
+                      <h3 class="profile-username text-center">{{ patientData.name }}</h3>
+                      <p class="text-muted text-center">{{ patientData.email }}</p>
+                      <ul class="list-group list-group-unbordered mb-3">
+                        <li class="list-group-item"><b>Birthdate</b> <span class="float-right">{{ patientData.birthdate }}</span></li>
+                        <li class="list-group-item"><b>Phone</b> <span class="float-right">{{ patientData.phone }}</span></li>
+                        <li class="list-group-item"><b>Address</b> <span class="float-right">{{ patientData.address }}</span></li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <!-- Appointment and Prescription Section -->
+                <div class="col-md-9">
+                  <div class="card">
+                    <div class="card-header p-2">
+                      <ul class="nav nav-pills">
+                        <li class="nav-item"><a class="nav-link active" href="#appointment" data-toggle="tab">Appointment</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#prescription" data-toggle="tab">Prescription</a></li>
+                      </ul>
+                    </div>
+                    <div class="card-body">
+                      <div class="tab-content">
+                        <!-- Appointment Tab -->
+                        <div class="tab-pane fade show active" id="appointment">
+                          <app-patient-appointment-table></app-patient-appointment-table>
+                        </div>
+                        <!-- Prescription Tab -->
+                        <div class="tab-pane fade" id="prescription">
+                          <app-patient-prescription-table></app-patient-prescription-table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Medical History Tab -->
+            <div class="tab-pane fade" id="medical-history" role="tabpanel" aria-labelledby="medical-history-tab">
+              <div class="row">
+                <!-- Dental History Section -->
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <button class="btn btn-primary" (click)="openAddDentalHistoryModal()">
+                        <i class="fas fa-plus"></i> Add Dental History
+                      </button>
+                    </div>
+                    <div class="card-body">
+                      <app-patient-dentalhistory-table></app-patient-dentalhistory-table>
+                    </div>
+                  </div>
+                </div>
+                <!-- Medical History Section -->
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header">
+                      <button class="btn btn-primary" (click)="openAddMedicalHistoryModal()">
+                        <i class="fas fa-plus"></i> Add Medical History
+                      </button>
+                    </div>
+                    <div class="card-body">
+                      <app-patient-medicalhistory-table></app-patient-medicalhistory-table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Treatment Tab -->
+            <div class="tab-pane fade" id="treatment" role="tabpanel" aria-labelledby="treatment-tab">
+              <div class="card">
+                <div class="card-body">
+                  <app-patient-treatment-table></app-patient-treatment-table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+<!-- Add/Edit Dental History Modal -->
+<app-add-edit-dental-history
+  [isVisible]="isAddDentalHistoryModalVisible"
+  [title]="'Add Dental History'"
+  (closeModal)="closeAddDentalHistoryModal()"
+  (submitModal)="handleDentalHistorySubmit($event)"
+></app-add-edit-dental-history>
+
+<!-- Add/Edit Medical History Modal -->
+<app-add-edit-medical-history
+  [isVisible]="isAddMedicalHistoryModalVisible"
+  [title]="'Add Medical History'"
+  (closeModal)="closeAddMedicalHistoryModal()"
+  (submitModal)="handleMedicalHistorySubmit($event)"
+></app-add-edit-medical-history>

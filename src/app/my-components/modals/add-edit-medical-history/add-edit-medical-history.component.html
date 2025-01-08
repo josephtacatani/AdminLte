@@ -1,0 +1,176 @@
+<div *ngIf="isVisible">
+    <div class="modal-backdrop fade show"></div> <!-- Backdrop -->
+    <div
+      class="modal fade show"
+      [class.d-block]="isVisible"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="addMedicalHistoryModalLabel"
+      aria-hidden="true"
+      data-backdrop="static"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addMedicalHistoryModalLabel">{{ title }}</h5>
+            <button type="button" class="close" aria-label="Close" (click)="close()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="medicalHistoryForm">
+              <!-- Question 1: Condition -->
+              <div class="form-group">
+                <label for="condition">What condition is being treated?</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="condition"
+                  formControlName="condition"
+                  placeholder="Enter condition"
+                />
+              </div>
+  
+              <!-- Question 2: Symptoms -->
+              <div class="form-group">
+                <label for="symptoms">Describe the symptoms:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="symptoms"
+                  formControlName="symptoms"
+                  placeholder="Enter symptoms"
+                />
+              </div>
+  
+              <!-- Question 3: Last Visit Date -->
+              <div class="form-group">
+                <label for="lastVisitDate">When was your last visit to the doctor?</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="lastVisitDate"
+                  formControlName="lastVisitDate"
+                />
+              </div>
+  
+              <!-- Question 4: Ongoing Treatment -->
+              <div class="form-group">
+                <label>Are you undergoing ongoing treatment?</label>
+                <div class="form-check">
+                  <input
+                    type="radio"
+                    id="ongoingTreatmentYes"
+                    class="form-check-input"
+                    formControlName="ongoingTreatment"
+                    [value]="true"
+                  />
+                  <label for="ongoingTreatmentYes" class="form-check-label">Yes</label>
+                </div>
+                <div class="form-check">
+                  <input
+                    type="radio"
+                    id="ongoingTreatmentNo"
+                    class="form-check-input"
+                    formControlName="ongoingTreatment"
+                    [value]="false"
+                  />
+                  <label for="ongoingTreatmentNo" class="form-check-label">No</label>
+                </div>
+              </div>
+  
+              <!-- Question 5: Medication Details -->
+              <div class="form-group">
+                <label for="medicationDetails">Are you taking any prescription or non-prescription medication? If so, specify:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="medicationDetails"
+                  formControlName="medicationDetails"
+                  placeholder="Enter medication details"
+                />
+              </div>
+  
+              <!-- Question 6: Known Allergies -->
+              <div class="form-group">
+                <label for="allergies">Known Allergies:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="allergies"
+                  formControlName="allergies"
+                  placeholder="Enter allergies"
+                />
+              </div>
+  
+              <!-- Question 7: Illnesses -->
+              <div class="form-group">
+                <label for="illnesses">Do you have or have you had any of the following illnesses?</label>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="diabetes"
+                        formControlName="illnesses"
+                        value="Diabetes"
+                      />
+                      <label for="diabetes" class="form-check-label">Diabetes</label>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="heartDisease"
+                        formControlName="illnesses"
+                        value="Heart Disease"
+                      />
+                      <label for="heartDisease" class="form-check-label">Heart Disease</label>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="kidneyDisease"
+                        formControlName="illnesses"
+                        value="Kidney Disease"
+                      />
+                      <label for="kidneyDisease" class="form-check-label">Kidney Disease</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="stroke"
+                        formControlName="illnesses"
+                        value="Stroke"
+                      />
+                      <label for="stroke" class="form-check-label">Stroke</label>
+                    </div>
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="none"
+                        formControlName="illnesses"
+                        value="None"
+                      />
+                      <label for="none" class="form-check-label">None</label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+            <button type="button" class="btn btn-primary" (click)="submitMedicalHistory()">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
