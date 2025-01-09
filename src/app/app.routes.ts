@@ -37,7 +37,7 @@ export const routes: Routes = [
     children: [
       { path: '', component: DefaultviewdentistComponent},
       { path: 'patients', component: PatientsComponent ,},
-      { path: 'patients/patient-details/:id', component: PatientDetailsComponent }, // Moved to the same level
+      { path: 'patients/patient-details/:patientId', component: PatientDetailsComponent }, // Moved to the same level
       { path: 'schedule', component: ScheduleComponent},
       { path: 'walkinrequest', component: WalkinrequestComponent},
       { path: 'onlinerequest', component: OnlinerequestComponent},

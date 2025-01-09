@@ -1,72 +1,83 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { AppointmentDetail } from 'src/app/interfaces/patients.interface';
-import { TableComponent } from 'src/app/my-components/tables/table/table.component';
 import { DisplayTableComponent } from 'src/app/my-components/tables/display-table/display-table.component';
+import { PatientAppointmentService } from 'src/app/services/patients/patient-appointment-service';
 
 @Component({
   selector: 'app-patient-appointment-table',
   standalone: true,
   imports: [CommonModule, DisplayTableComponent],
   templateUrl: './patient-appointment-table.component.html',
-  styleUrls: ['./patient-appointment-table.component.scss']
+  styleUrls: ['./patient-appointment-table.component.scss'],
 })
-export class PatientAppointmentTableComponent {
-  pagetitle = 'Patients';
-  sortColumn: string = 'date'; // Default sort column
-  sortDirection: string = 'asc'; // Default sort direction
-
-  appointmentDetails: AppointmentDetail[] = [
-    { date: '2023-10-01', time: '10:00 AM', doctor: 'Dr. Jane Doe', status: 'Confirmed' },
-    { date: '2023-10-02', time: '11:00 AM', doctor: 'Dr. Jane Doe', status: 'Pending' }
-  ];
-
-  filteredAppointmentDetails: AppointmentDetail[] = [...this.appointmentDetails];
-
+export class PatientAppointmentTableComponent implements OnInit {
+  pagetitle = 'Patient Appointments';
+  appointmentDetails: AppointmentDetail[] = [];
+  filteredAppointmentDetails: AppointmentDetail[] = [];
   columns = [
     { key: 'date', label: 'Date', sortable: true },
     { key: 'time', label: 'Time', sortable: true },
     { key: 'doctor', label: 'Doctor', sortable: true },
     { key: 'status', label: 'Status', sortable: true },
   ];
-
-  itemsPerPage = 10;
+  sortColumn = 'date';
+  sortDirection: 'asc' | 'desc' = 'asc';
   searchTerm = '';
   currentPage = 1;
+  itemsPerPage = 10;
 
-  constructor(private router: Router) {}
+  constructor(
+    private appointmentService: PatientAppointmentService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    this.sortAppointmentDetails(this.sortColumn);
+    this.loadAppointmentDetails();
+  }
+
+  loadAppointmentDetails(): void {
+    this.appointmentService.getAppointments().subscribe({
+      next: (appointments) => {
+        this.appointmentDetails = appointments;
+        this.filteredAppointmentDetails = [...this.appointmentDetails];
+      },
+      error: (err) => console.error('Error loading appointments:', err),
+    });
   }
 
   filterAppointmentDetails(search: string): void {
-    this.searchTerm = search.trim(); // Trim unnecessary spaces
-
-    if (this.searchTerm === '') {
-      // Reset to full list if the search box is cleared
-      this.filteredAppointmentDetails = [...this.appointmentDetails];
-    } else {
-      // Filter dynamically based on search term
-      this.filteredAppointmentDetails = this.appointmentDetails.filter((appointment) =>
-        Object.values(appointment)
-          .join(' ')
-          .toLowerCase()
-          .includes(this.searchTerm.toLowerCase())
-      );
-    }
+    this.searchTerm = search.trim().toLowerCase();
+    this.filteredAppointmentDetails = this.searchTerm
+      ? this.appointmentDetails.filter((appointment) =>
+          Object.values(appointment)
+            .join(' ')
+            .toLowerCase()
+            .includes(this.searchTerm)
+        )
+      : [...this.appointmentDetails];
   }
 
   sortAppointmentDetails(column: string): void {
-    this.sortColumn = column;
-    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    if (this.sortColumn === column) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = 'asc';
+    }
 
     this.filteredAppointmentDetails.sort((a, b) => {
-      const valA = (a as any)[column]?.toString().toLowerCase() || ''; // Access dynamically
-      const valB = (b as any)[column]?.toString().toLowerCase() || '';
+      const aValue = a[column as keyof AppointmentDetail] as string;
+      const bValue = b[column as keyof AppointmentDetail] as string;
 
-      return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
+      if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
+      if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+      return 0;
     });
+  }
+
+  goToAppointmentDetails(id: number): void {
+    this.router.navigate([`/appointments/${id}`]);
   }
 }

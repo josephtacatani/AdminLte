@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { GeneralModalComponent } from 'src/app/my-components/modals/general-modal/general-modal.component';
 import { TableComponent } from 'src/app/my-components/tables/table/table.component';
+import { Schedule } from 'src/app/interfaces/patients.interface';
+import { ScheduleService } from 'src/app/services/dentist/schedules.service';
 
 @Component({
   selector: 'app-schedule',
@@ -20,14 +22,24 @@ export class ScheduleComponent implements OnInit {
   sortColumn: string = 'date';
   sortDirection: string = 'asc';
 
-  originalSchedules = [
-    { date: '2025-01-12', startTime: '09:00 AM', endTime: '05:00 PM', duration: '8 hours' },
-    { date: '2025-01-13', startTime: '10:00 AM', endTime: '06:00 PM', duration: '8 hours' },
-    { date: '2025-01-14', startTime: '09:30 AM', endTime: '05:30 PM', duration: '8 hours' },
-  ];
-  filteredSchedules = [...this.originalSchedules];
+  originalSchedules: Schedule[] = [];
+  filteredSchedules: Schedule[] = [];
 
-  ngOnInit(): void {}
+  constructor(private scheduleService: ScheduleService) {}
+
+  ngOnInit(): void {
+    this.fetchSchedules();
+  }
+
+  fetchSchedules(): void {
+    this.scheduleService.getSchedules().subscribe({
+      next: (schedules) => {
+        this.originalSchedules = schedules;
+        this.filteredSchedules = [...schedules];
+      },
+      error: (err) => console.error('Failed to fetch schedules:', err),
+    });
+  }
 
   openAddScheduleModal(): void {
     this.isAddScheduleModalVisible = true;

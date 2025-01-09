@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TableComponent } from 'src/app/my-components/tables/table/table.component';
-import { Patient } from 'src/app/interfaces/patients.interface';
+import { PatientDataService } from 'src/app/services/patients/patient-data-service';
+import { PatientData } from 'src/app/interfaces/patients.interface';
 
 
 @Component({
@@ -15,18 +16,15 @@ import { Patient } from 'src/app/interfaces/patients.interface';
 export class PatientsComponent implements OnInit {
   pagetitle = 'Patients';
   sortColumn: string = 'name'; // Default sort column
-sortDirection: string = 'asc'; // Default sort direction
+  sortDirection: string = 'asc'; // Default sort direction
 
-  originalPatients: Patient[] = [
-    { id: 101, photo: 'assets/img/patient1.jpg', name: 'John Doe', birthday: '1990-01-01', gender: 'Male', contact: '123-456-7890', email: 'john.doe@example.com' },
-    { id: 102, photo: 'assets/img/patient2.jpg', name: 'Jane Smith', birthday: '1985-05-15', gender: 'Female', contact: '987-654-3210', email: 'jane.smith@example.com' }
-  ];
-
-  filteredPatients: Patient[] = [...this.originalPatients];
+  originalPatients: PatientData[] = [];
+  filteredPatients: PatientData[] = [];
+  errorMessage: string = '';
 
   columns = [
     { key: 'photo', label: 'Photo', render: (data: any) => `<img src="${data}" class="img-thumbnail" width="50" alt="Photo">`, sortable: false },
-    { key: 'name', label: 'Patient', sortable: true },
+    { key: 'name', label: 'PatientData', sortable: true },
     { key: 'birthday', label: 'Birthday', sortable: true },
     { key: 'gender', label: 'Gender', sortable: true },
     { key: 'contact', label: 'Contact', sortable: false },
@@ -42,21 +40,44 @@ sortDirection: string = 'asc'; // Default sort direction
   searchTerm = '';
   currentPage = 1;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private patientDataService: PatientDataService) {}
 
   ngOnInit(): void {
-    this.sortPatients(this.sortColumn);
+    this.loadPatients();
   }
+
+  loadPatients(): void {
+    this.patientDataService.getPatients().subscribe({
+      next: (data: PatientData[]) => {
+        this.originalPatients = data;
+        this.filteredPatients = [...this.originalPatients];
+        this.sortPatients(this.sortColumn); // Apply default sorting
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load patients.';
+        console.error(err);
+      }
+    });
+  }
+
   filterPatients(search: string): void {
-    this.searchTerm = search;
-    this.filteredPatients = this.originalPatients.filter((patient) =>
-      Object.values(patient).join(' ').toLowerCase().includes(search.toLowerCase())
-    );
+    this.searchTerm = search.trim();
+    if (!this.searchTerm) {
+      this.filteredPatients = [...this.originalPatients];
+    } else {
+      this.filteredPatients = this.originalPatients.filter((patient) =>
+        Object.values(patient)
+          .join(' ')
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase())
+      );
+    }
   }
 
   sortPatients(column: string): void {
     this.sortColumn = column;
     this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+
     this.filteredPatients.sort((a: any, b: any) => {
       const valA = a[column]?.toString().toLowerCase() || '';
       const valB = b[column]?.toString().toLowerCase() || '';
@@ -64,19 +85,17 @@ sortDirection: string = 'asc'; // Default sort direction
     });
   }
 
-
   handleRowAction(rowData: any): void {
     this.navigateToPatientDetails(rowData.id);
   }
 
   navigateToPatientDetails(patientId: number): void {
-    console.log('Navigating to patient with ID:', patientId);
     this.router.navigate([`/dentistdashboard/patients/patient-details`, patientId]);
   }
 
   handleActionClick(event: { action: string; row: any }): void {
     if (event.action === 'view') {
-      this.navigateToPatientDetails(event.row.id);
+      this.navigateToPatientDetails(event.row.patientId);
     }
   }
 

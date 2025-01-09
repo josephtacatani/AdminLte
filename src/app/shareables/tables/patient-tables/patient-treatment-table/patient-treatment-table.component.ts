@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AppointmentDetail, TreatmentData } from 'src/app/interfaces/patients.interface';
+import { TreatmentData } from 'src/app/interfaces/patients.interface';
 import { DisplayTableComponent } from 'src/app/my-components/tables/display-table/display-table.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { PatientTreatmentService } from 'src/app/services/patients/patient-treatment.service';
 
 @Component({
   selector: 'app-patient-treatment-table',
@@ -11,35 +12,19 @@ import { Router } from '@angular/router';
   templateUrl: './patient-treatment-table.component.html',
   styleUrls: ['./patient-treatment-table.component.scss']
 })
-export class PatientTreatmentTableComponent {
+export class PatientTreatmentTableComponent implements OnInit {
   pagetitle = 'Patients';
-  sortColumn: string = 'date'; // Default sort column
+  sortColumn: string = 'dateVisit'; // Default sort column
   sortDirection: string = 'asc'; // Default sort direction
 
-  treatmentData: TreatmentData[] = [
-    {
-      dateVisit: '2023-10-01',
-      teethNos: '12, 14',
-      treatment: 'Filling',
-      description: 'Composite filling',
-      fees: '$200',
-      remarks: 'Follow-up in 6 months'
-    },
-    {
-      dateVisit: '2023-10-15',
-      teethNos: '22',
-      treatment: 'Extraction',
-      description: 'Tooth extraction',
-      fees: '$150',
-      remarks: 'Healing well'
-    }
-  ];
-
-  filteredtreatmentData: TreatmentData[] = [...this.treatmentData];
+  treatmentData: TreatmentData[] = [];
+  filteredtreatmentData: TreatmentData[] = [];
+  errorMessage: string = '';
+  patientId: number | null = null;
 
   columns = [
-    { key: 'dateVisit', label: 'Date Visit', sortable: true }, // Corrected key
-    { key: 'teethNos', label: 'Teeth No.s', sortable: true },  // Corrected key
+    { key: 'dateVisit', label: 'Date Visit', sortable: true },
+    { key: 'teethNos', label: 'Teeth No.s', sortable: true },
     { key: 'treatment', label: 'Treatment', sortable: true },
     { key: 'description', label: 'Description', sortable: false },
     { key: 'fees', label: 'Fees', sortable: false },
@@ -50,20 +35,45 @@ export class PatientTreatmentTableComponent {
   searchTerm = '';
   currentPage = 1;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private patientTreatmentService: PatientTreatmentService
+  ) {}
 
   ngOnInit(): void {
-    this.sorttreatmentData(this.sortColumn);
+    this.route.paramMap.subscribe((params) => {
+      const id = Number(params.get('id')); // Extract patient ID from route
+      if (id) {
+        this.patientId = id;
+        this.loadTreatmentData(id); // Load treatment data for the specific patient
+      } else {
+        this.errorMessage = 'Invalid patient ID.';
+      }
+    });
+  }
+
+  loadTreatmentData(patientId: number): void {
+    this.patientTreatmentService.getTreatments().subscribe({
+      next: (data: TreatmentData[]) => {
+        // Filter treatments specific to the patient by patientId
+        this.treatmentData = data.filter((treatment) => treatment.patientId === patientId);
+        this.filteredtreatmentData = [...this.treatmentData];
+        this.sorttreatmentData(this.sortColumn);
+      },
+      error: (err) => {
+        this.errorMessage = 'Failed to load treatment data.';
+        console.error(err);
+      }
+    });
   }
 
   filtertreatmentData(search: string): void {
-    this.searchTerm = search.trim(); // Trim unnecessary spaces
+    this.searchTerm = search.trim();
 
     if (this.searchTerm === '') {
-      // Reset to full list if the search box is cleared
       this.filteredtreatmentData = [...this.treatmentData];
     } else {
-      // Filter dynamically based on search term
       this.filteredtreatmentData = this.treatmentData.filter((treatment) =>
         Object.values(treatment)
           .join(' ')
@@ -78,7 +88,7 @@ export class PatientTreatmentTableComponent {
     this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
 
     this.filteredtreatmentData.sort((a, b) => {
-      const valA = (a as any)[column]?.toString().toLowerCase() || ''; // Access dynamically
+      const valA = (a as any)[column]?.toString().toLowerCase() || '';
       const valB = (b as any)[column]?.toString().toLowerCase() || '';
 
       return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
