@@ -1,6 +1,6 @@
 <section>
   <div class="row">
-    <div class="col-12 col-sm-6 col-md-12">
+    <div class="col-12">
       <div class="card card-primary card-outline card-tabs">
         <div class="card-header p-0 pt-1 border-bottom-0">
           <ul class="nav nav-tabs" id="custom-tabs-three-tab" role="tablist">
@@ -20,24 +20,23 @@
             <!-- Overview Tab -->
             <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview-tab">
               <div class="row">
-                
-                <app-info-card
-                [title]="'Patient Info'"
-                [imageSrc]="'assets/img/user4-128x128.jpg'"
-                [name]="patientData?.name ?? ''"
-                [subtitle]="patientData?.email ?? ''"
-                [details]="[
-                  { label: 'Birthdate', value: patientData?.birthday ?? 'N/A' },
-                  { label: 'Phone', value: patientData?.contact ?? 'N/A' },
-                  { label: 'Address', value: patientData?.address ?? 'N/A' }
-                ]"
-              ></app-info-card>
-              
-                
-
+                <!-- Patient Info Card -->
+                <div class="col-12 col-md-3 mb-3">
+                  <app-info-card
+                    [title]="'Patient Info'"
+                    [imageSrc]="'assets/img/user4-128x128.jpg'"
+                    [name]="patientData?.name ?? ''"
+                    [subtitle]="patientData?.email ?? ''"
+                    [details]="[
+                      { label: 'Birthdate', value: patientData?.birthday ?? 'N/A' },
+                      { label: 'Phone', value: patientData?.contact ?? 'N/A' },
+                      { label: 'Address', value: patientData?.address ?? 'N/A' }
+                    ]"
+                  ></app-info-card>
+                </div>
                 
                 <!-- Appointment and Prescription Section -->
-                <div class="col-md-9">
+                <div class="col-12 col-md-9">
                   <div class="card">
                     <div class="card-header p-2">
                       <ul class="nav nav-pills">
@@ -61,11 +60,12 @@
                 </div>
               </div>
             </div>
-            <!-- Medical History Tab -->
+            
+            <!-- Other Tabs -->
             <div class="tab-pane fade" id="medical-history" role="tabpanel" aria-labelledby="medical-history-tab">
+              <!-- Medical/Dental History Section -->
               <div class="row">
-                <!-- Dental History Section -->
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                   <div class="card">
                     <div class="card-header">
                       <button class="btn btn-primary" (click)="openAddDentalHistoryModal()">
@@ -77,8 +77,7 @@
                     </div>
                   </div>
                 </div>
-                <!-- Medical History Section -->
-                <div class="col-md-6">
+                <div class="col-12 col-md-6">
                   <div class="card">
                     <div class="card-header">
                       <button class="btn btn-primary" (click)="openAddMedicalHistoryModal()">
@@ -92,7 +91,6 @@
                 </div>
               </div>
             </div>
-            <!-- Treatment Tab -->
             <div class="tab-pane fade" id="treatment" role="tabpanel" aria-labelledby="treatment-tab">
               <div class="card">
                 <div class="card-body">

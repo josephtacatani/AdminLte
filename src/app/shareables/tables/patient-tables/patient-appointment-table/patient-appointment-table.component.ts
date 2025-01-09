@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppointmentDetail } from 'src/app/interfaces/patients.interface';
 import { DisplayTableComponent } from 'src/app/my-components/tables/display-table/display-table.component';
 import { PatientAppointmentService } from 'src/app/services/patients/patient-appointment-service';
@@ -16,6 +16,9 @@ export class PatientAppointmentTableComponent implements OnInit {
   pagetitle = 'Patient Appointments';
   appointmentDetails: AppointmentDetail[] = [];
   filteredAppointmentDetails: AppointmentDetail[] = [];
+  errorMessage = '';
+  isLoading = false;
+
   columns = [
     { key: 'date', label: 'Date', sortable: true },
     { key: 'time', label: 'Time', sortable: true },
@@ -29,21 +32,51 @@ export class PatientAppointmentTableComponent implements OnInit {
   itemsPerPage = 10;
 
   constructor(
+    private route: ActivatedRoute,
     private appointmentService: PatientAppointmentService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.loadAppointmentDetails();
+    this.route.paramMap.subscribe((params) => {
+      const patientId = Number(params.get('patientId'));
+      console.log('Retrieved patientId from route:', patientId);
+
+      if (patientId) {
+        this.loadAppointmentDetails(patientId);
+      } else {
+        this.errorMessage = 'Invalid patient ID.';
+        console.error(this.errorMessage);
+      }
+    });
   }
 
-  loadAppointmentDetails(): void {
+  loadAppointmentDetails(patientId: number): void {
+    this.isLoading = true;
+
     this.appointmentService.getAppointments().subscribe({
-      next: (appointments) => {
-        this.appointmentDetails = appointments;
-        this.filteredAppointmentDetails = [...this.appointmentDetails];
+      next: (appointments: AppointmentDetail[]) => {
+        // Filter appointments by `patientId`
+        const filteredAppointments = appointments.filter(
+          (appointment) => appointment.patientId === patientId
+        );
+
+        if (filteredAppointments.length > 0) {
+          this.appointmentDetails = filteredAppointments;
+          this.filteredAppointmentDetails = [...filteredAppointments];
+          console.log('Appointments for patient:', filteredAppointments);
+        } else {
+          this.errorMessage = `No appointments found for patient ID ${patientId}.`;
+          console.warn(this.errorMessage);
+        }
+
+        this.isLoading = false;
       },
-      error: (err) => console.error('Error loading appointments:', err),
+      error: (err) => {
+        this.errorMessage = 'Failed to load appointments.';
+        console.error(this.errorMessage, err);
+        this.isLoading = false;
+      },
     });
   }
 

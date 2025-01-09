@@ -49,10 +49,17 @@ export class ScheduleComponent implements OnInit {
     this.isAddScheduleModalVisible = false;
   }
 
-  handleAddSchedule(schedule: any): void {
-    console.log('Schedule added:', schedule);
-    this.originalSchedules.push(schedule);
-    this.filteredSchedules = [...this.originalSchedules];
+  handleAddSchedule(schedule: Schedule): void {
+    console.log('handleAddSchedule called with:', schedule); // Debug log
+    this.scheduleService.addSchedule(schedule).subscribe({
+      next: (newSchedule) => {
+        console.log('API response:', newSchedule);
+        this.originalSchedules.push(newSchedule); // Add the returned schedule
+        this.filteredSchedules = [...this.originalSchedules];
+        this.isAddScheduleModalVisible = false; // Close modal
+      },
+      error: (err) => console.error('Failed to add schedule:', err),
+    });
   }
 
   sortSchedules(column: string): void {

@@ -21,15 +21,10 @@ export interface PatientData {
   address: string; // Optional address field
 }
 
-export interface AppointmentData {
-  id: number; // Unique identifier for the appointment
-  date: string; // Appointment date (YYYY-MM-DD)
-  time: string; // Appointment time (e.g., '10:00 AM')
-  status: string; // Status (e.g., 'Confirmed', 'Pending')
-}
 
 export interface AppointmentDetail {
   id: number; // Unique identifier for detailed appointment
+  patientId: number; // Corresponding patient's ID
   date: string; // Appointment date (YYYY-MM-DD)
   time: string; // Appointment time
   doctor: string; // Doctor's name
@@ -38,6 +33,7 @@ export interface AppointmentDetail {
 
 export interface PrescriptionData {
   id: number; // Unique identifier for the prescription
+  patientId: number; // Corresponding patient's ID
   date: string; // Prescription date (YYYY-MM-DD)
   medicine: string; // Name of the prescribed medicine
   notes: string; // Dosage or usage instructions
@@ -56,6 +52,7 @@ export interface TreatmentData {
 
 export interface DentalHistoryData {
   id: number; // Unique identifier for dental history
+  patientId: number; // Corresponding patient's ID
   previousDentist: string; // Name of the previous dentist
   lastDentalVisit: string; // Last dental visit date (YYYY-MM-DD)
   action: string; // Action associated (e.g., 'View')
@@ -63,6 +60,7 @@ export interface DentalHistoryData {
 
 export interface MedicalHistoryData {
   id: number; // Unique identifier for medical history
+  patientId?: number; // Corresponding patient's ID
   condition?: string; // Condition being treated (optional)
   symptoms?: string; // Symptoms experienced (optional)
   lastVisitDate?: string; // Last medical visit date (YYYY-MM-DD) (optional)
@@ -74,7 +72,9 @@ export interface MedicalHistoryData {
 }
 
 export interface Schedule {
+  id: number; // Unique identifier for the schedule
   date: string; // Date of the schedule (YYYY-MM-DD)
+  dentistId: number; // Dentist's ID
   startTime: string; // Start time of the schedule (e.g., '09:00 AM')
   endTime: string; // End time of the schedule (e.g., '05:00 PM')
   duration: string; // Duration of the schedule (e.g., '8 hours')

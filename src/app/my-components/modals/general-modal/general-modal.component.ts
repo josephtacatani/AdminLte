@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Schedule } from 'src/app/interfaces/schedule.interface';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Schedule } from 'src/app/interfaces/patients.interface';
 
 @Component({
   selector: 'app-general-modal',

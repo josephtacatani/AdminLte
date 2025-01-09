@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DisplayTableComponent } from 'src/app/my-components/tables/display-table/display-table.component';
 import { PrescriptionData } from 'src/app/interfaces/patients.interface';
 import { PrescriptionService } from 'src/app/services/patients/patient-prescription-service';
@@ -19,6 +19,7 @@ export class PatientPrescriptionTableComponent implements OnInit {
   prescriptionData: PrescriptionData[] = [];
   filteredPrescriptionData: PrescriptionData[] = [];
   errorMessage: string = ''; // Declare error message variable
+  isLoading: boolean = false; // Loading state
 
   columns = [
     { key: 'date', label: 'Date', sortable: true },
@@ -31,26 +32,50 @@ export class PatientPrescriptionTableComponent implements OnInit {
   currentPage = 1;
 
   constructor(
+    private route: ActivatedRoute,
     private router: Router,
     private prescriptionService: PrescriptionService
   ) {}
 
   ngOnInit(): void {
-    this.loadPrescriptions();
+    this.route.paramMap.subscribe((params) => {
+      const patientId = Number(params.get('patientId')); // Retrieve patientId from route
+      console.log('Retrieved patientId from route:', patientId);
+
+      if (patientId) {
+        this.loadPrescriptions(patientId);
+      } else {
+        this.errorMessage = 'Invalid patient ID.';
+        console.error(this.errorMessage);
+      }
+    });
   }
 
-  // Load all prescriptions
-  loadPrescriptions(): void {
+  // Load prescriptions for a specific patient
+  loadPrescriptions(patientId: number): void {
+    this.isLoading = true;
+
     this.prescriptionService.getPrescriptions().subscribe({
-      next: (data) => {
-        this.prescriptionData = data;
-        this.filteredPrescriptionData = [...this.prescriptionData]; // Initialize filtered data
-        this.sortprescriptionData(this.sortColumn); // Apply initial sorting
+      next: (data: PrescriptionData[]) => {
+        // Filter prescriptions by `patientId`
+        const filteredData = data.filter((prescription) => prescription.patientId === patientId);
+
+        if (filteredData.length > 0) {
+          this.prescriptionData = filteredData;
+          this.filteredPrescriptionData = [...filteredData];
+          console.log('Prescriptions for patient:', filteredData);
+        } else {
+          this.errorMessage = `No prescriptions found for patient ID ${patientId}.`;
+          console.warn(this.errorMessage);
+        }
+
+        this.isLoading = false;
       },
       error: (err) => {
-        this.errorMessage = 'Failed to load prescriptions';
-        console.error(err);
-      }
+        this.errorMessage = 'Failed to load prescriptions.';
+        console.error(this.errorMessage, err);
+        this.isLoading = false;
+      },
     });
   }
 

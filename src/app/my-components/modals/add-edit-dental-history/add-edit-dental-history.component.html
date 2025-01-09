@@ -20,7 +20,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <form [formGroup]="dentalHistoryForm">
+          <form [formGroup]="dentalHistoryForm" (ngSubmit)="submitDentalHistory()">
             <div class="form-group">
               <label for="previousDentist">Previous Dentist <span class="text-danger">*</span></label>
               <input
@@ -28,8 +28,10 @@
                 class="form-control"
                 id="previousDentist"
                 formControlName="previousDentist"
+                [attr.aria-required]="true"
+                [attr.aria-invalid]="dentalHistoryForm.get('previousDentist')?.invalid"
               />
-              <div *ngIf="dentalHistoryForm.get('previousDentist')?.invalid && dentalHistoryForm.get('previousDentist')?.touched" class="text-danger">
+              <div *ngIf="dentalHistoryForm.get('previousDentist')?.hasError('required') && dentalHistoryForm.get('previousDentist')?.touched" class="text-danger">
                 Previous Dentist is required.
               </div>
             </div>
@@ -40,16 +42,18 @@
                 class="form-control"
                 id="lastDentalVisit"
                 formControlName="lastDentalVisit"
+                [attr.aria-required]="true"
+                [attr.aria-invalid]="dentalHistoryForm.get('lastDentalVisit')?.invalid"
               />
-              <div *ngIf="dentalHistoryForm.get('lastDentalVisit')?.invalid && dentalHistoryForm.get('lastDentalVisit')?.touched" class="text-danger">
+              <div *ngIf="dentalHistoryForm.get('lastDentalVisit')?.hasError('required') && dentalHistoryForm.get('lastDentalVisit')?.touched" class="text-danger">
                 Last Dental Visit is required.
               </div>
             </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+              <button type="submit" class="btn btn-primary" [disabled]="dentalHistoryForm.invalid">Submit</button>
+            </div>
           </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
-          <button type="button" class="btn btn-primary" (click)="submitDentalHistory()">Submit</button>
         </div>
       </div>
     </div>
