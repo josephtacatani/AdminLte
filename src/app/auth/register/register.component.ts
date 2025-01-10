@@ -1,84 +1,111 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-declare var $: any;
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+
+import { Router } from '@angular/router';
+import { PatientDataService } from 'src/app/services/patients/patient-data-service';
 
 @Component({
   selector: 'app-register',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent implements OnInit {
+  registerForm!: FormGroup;
+  passwordStrength: string = 'Weak';
+  progressBarWidth: number = 0;
+  isSubmitting: boolean = false;
+
+  constructor(
+    private fb: FormBuilder,
+    private patientDataService: PatientDataService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
-    $('#reservationdate').datetimepicker({
-      format: 'L',
-      defaultDate: new Date() // Set default date to today
-    });
+    this.initializeForm();
+  }
 
-    $('.select2').select2({
-      placeholder: 'Select a Sex',
-      allowClear: true
+  initializeForm(): void {
+    this.registerForm = this.fb.group({
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      dateOfBirth: ['', Validators.required],
+      gender: ['', Validators.required],
+      address: ['', Validators.required],
+      mobile: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+      email: ['', [Validators.required, Validators.email]],
+      profilePicture: [null, Validators.required],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      confirmPassword: ['', Validators.required],
     });
   }
 
+  handleFileInput(event: Event): void {
+    const file = (event.target as HTMLInputElement)?.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64String = reader.result as string;
+        this.registerForm.patchValue({ profilePicture: base64String });
+      };
+      reader.onerror = (error) => {
+        console.error('Error reading file:', error);
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   checkPasswordStrength(): void {
-    const password = (document.getElementById('password') as HTMLInputElement).value;
+    const password = this.registerForm.get('password')?.value || '';
     let strength = 0;
 
-    // Criteria
     const criteria = [
-      { regex: /[a-z]/, elementId: 'lowercase' },
-      { regex: /[A-Z]/, elementId: 'lowercase' },
-      { regex: /[0-9]/, elementId: 'number' },
-      { regex: /[!@#$%^&*]/, elementId: 'special' },
-      { regex: /.{8,}/, elementId: 'length' }
+      { regex: /[a-z]/, description: 'lowercase' },
+      { regex: /[A-Z]/, description: 'uppercase' },
+      { regex: /[0-9]/, description: 'number' },
+      { regex: /[!@#$%^&*]/, description: 'special character' },
+      { regex: /.{8,}/, description: 'minimum 8 characters' }
     ];
 
-    criteria.forEach(criterion => {
-      const element = document.getElementById(criterion.elementId);
-      if (element) {
-        const icon = element.querySelector('i');
-        if (icon && criterion.regex.test(password)) {
-          icon.classList.add('fa-check', 'text-success');
-          icon.classList.remove('fa-times', 'text-danger');
-          strength += 20;
-        } else if (icon) {
-          icon.classList.add('fa-times', 'text-danger');
-          icon.classList.remove('fa-check', 'text-success');
-        }
+    criteria.forEach((criterion) => {
+      if (criterion.regex.test(password)) {
+        strength += 20;
       }
     });
 
-    // Update progress bar
-    const progressBar = document.getElementById('password-strength-bar');
-    if (progressBar) {
-      progressBar.style.width = `${strength}%`;
-      progressBar.setAttribute('aria-valuenow', strength.toString());
-
-      // Update progress bar color
-      progressBar.classList.remove('bg-danger', 'bg-warning', 'bg-success', 'bg-primary');
-      if (strength < 40) {
-        progressBar.classList.add('bg-danger');
-      } else if (strength < 60) {
-        progressBar.classList.add('bg-warning');
-      } else if (strength < 80) {
-        progressBar.classList.add('bg-primary');
-      } else {
-        progressBar.classList.add('bg-success');
-      }
+    this.progressBarWidth = strength;
+    if (strength < 40) {
+      this.passwordStrength = 'Weak';
+    } else if (strength < 60) {
+      this.passwordStrength = 'Moderate';
+    } else if (strength < 80) {
+      this.passwordStrength = 'Good';
+    } else {
+      this.passwordStrength = 'Strong';
     }
+  }
 
-    // Update strength text
-    const strengthText = document.getElementById('password-strength-text');
-    if (strengthText) {
-      if (strength < 40) {
-        strengthText.textContent = 'Weak';
-      } else if (strength < 60) {
-        strengthText.textContent = 'Moderate';
-      } else if (strength < 80) {
-        strengthText.textContent = 'Good';
-      } else {
-        strengthText.textContent = 'Strong';
-      }
+  onSubmit(): void {
+    if (this.registerForm.valid) {
+      this.isSubmitting = true;
+      const patientData = this.registerForm.value;
+
+      this.patientDataService.addPatient(patientData).subscribe({
+        next: (response) => {
+          console.log('Patient added successfully:', response);
+          this.isSubmitting = false;
+          this.router.navigate(['/patients']); // Redirect to patients list or another page
+        },
+        error: (err) => {
+          console.error('Failed to add patient:', err);
+          this.isSubmitting = false;
+        }
+      });
+    } else {
+      this.registerForm.markAllAsTouched();
     }
   }
 }

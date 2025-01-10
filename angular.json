@@ -108,6 +108,7 @@
           "configurations": {
             "production": {
               "browserTarget": "adminlteapp:build:production"
+              
             },
             "development": {
               "browserTarget": "adminlteapp:build:development"

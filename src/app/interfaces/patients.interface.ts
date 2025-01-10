@@ -12,13 +12,14 @@ export interface DentistData {
 export interface PatientData {
   id: number; // Unique identifier for the patient
   patientId: number; // Corresponding patient's ID
-  photo: string; // URL of the patient's photo
-  name: string; // Full name of the patient
-  birthday: string; // Date of birth (YYYY-MM-DD)
+  firstName: string; // First name of the patient
+  lastName: string; // Last name of the patient
+  dateOfBirth: string; // Date of birth (YYYY-MM-DD)
   gender: string; // Gender (Male/Female)
-  contact: string; // Contact number
   email: string; // Email address
+  mobileNumber: string; // Mobile number
   address: string; // Optional address field
+  profilePicture: string; // URL of the patient's profile picture
 }
 
 
@@ -61,7 +62,7 @@ export interface DentalHistoryData {
 export interface MedicalHistoryData {
   id: number; // Unique identifier for medical history
   patientId?: number; // Corresponding patient's ID
-  condition?: string; // Condition being treated (optional)
+  conditions?: string; // Condition being treated (optional)
   symptoms?: string; // Symptoms experienced (optional)
   lastVisitDate?: string; // Last medical visit date (YYYY-MM-DD) (optional)
   ongoingTreatment?: boolean; // Whether the patient is undergoing treatment

@@ -25,11 +25,11 @@
                   <app-info-card
                     [title]="'Patient Info'"
                     [imageSrc]="'assets/img/user4-128x128.jpg'"
-                    [name]="patientData?.name ?? ''"
+                    [name]="(patientData?.firstName ?? '') + ' ' + (patientData?.lastName ?? '')"
                     [subtitle]="patientData?.email ?? ''"
                     [details]="[
-                      { label: 'Birthdate', value: patientData?.birthday ?? 'N/A' },
-                      { label: 'Phone', value: patientData?.contact ?? 'N/A' },
+                      { label: 'Birthdate', value: patientData?.dateOfBirth ?? 'N/A' },
+                      { label: 'Phone', value: patientData?.mobileNumber ?? 'N/A' },
                       { label: 'Address', value: patientData?.address ?? 'N/A' }
                     ]"
                   ></app-info-card>

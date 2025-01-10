@@ -9,7 +9,7 @@ import { Schedule } from 'src/app/interfaces/patients.interface';
   providedIn: 'root', // Ensures the service is available application-wide
 })
 export class ScheduleService {
-  private readonly apiUrl = 'http://localhost:3000/schedules'; // API endpoint
+  private readonly apiUrl = 'http://localhost:8082/schedules'; // API endpoint
 
   constructor(private http: HttpClient) {}
 
