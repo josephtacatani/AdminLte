@@ -1,7 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { FooterComponent } from 'src/app/footer/footer.component';
+import { Store } from '@ngrx/store';
+import { AuthActions } from 'src/app/auth/ngrx/login.actions';
 
 @Component({
   selector: 'app-patientdashboard',
@@ -11,8 +13,6 @@ import { FooterComponent } from 'src/app/footer/footer.component';
   styleUrls: ['./patientdashboard.component.scss']
 })
 export class PatientdashboardComponent {
-
-  constructor(private router: Router) {}
 
   PatientInfoDummyData = {
     name: 'John Doe',
@@ -28,15 +28,29 @@ export class PatientdashboardComponent {
     email: 'feliztoothdev@gmail.com',
   };
 
+  constructor(private router: Router, private store: Store) {}
+
   logout() {
     // Remove modal backdrop manually
     const backdrop = document.querySelector('.modal-backdrop');
     if (backdrop) {
       backdrop.remove();
     }
-
+  
+    const refreshToken = localStorage.getItem('refreshToken');
+  
+    if (refreshToken) {
+      // Dispatch logout action with refresh token
+      this.store.dispatch(AuthActions.logout({ refreshToken }));
+    } else {
+      // If refreshToken is missing, still dispatch logout action
+      this.store.dispatch(AuthActions.logout({ refreshToken: '' }));
+    }
+  
     this.router.navigate(['/login']);
   }
 
+
   
+
 }

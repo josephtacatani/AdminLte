@@ -17,35 +17,43 @@ import { PatientdashboardComponent } from './dashboard/patientdashboard/patientd
 import { DefaultviewComponent } from './dashboard/patientdashboard/defaultview/defaultview.component';
 import { AppointmentComponent } from './dashboard/patientdashboard/appointment/appointment.component';
 import { UserprofileComponent } from './dashboard/patientdashboard/userprofile/userprofile.component';
+import { AuthGuard } from './services/auth/auth.guard';
+import { LoginGuard } from './services/auth/login.guard';
+
+
 
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent },
+  { path: 'login', component: LoginComponent, canActivate: [LoginGuard] },
   { path: 'register', component: RegisterComponent },
+
   {
     path: 'patientdashboard',
     component: PatientdashboardComponent,
+    canActivate: [AuthGuard], // ✅ Protect patient dashboard
     children: [
       { path: '', component: DefaultviewComponent }, // Default view for /patientdashboard
-      { path: 'appointment', component: AppointmentComponent }, // /patientdashboard/appointment
-      { path: 'userprofile', component: UserprofileComponent }, // /patientdashboard/userprofile
+      { path: 'appointment', component: AppointmentComponent },
+      { path: 'userprofile', component: UserprofileComponent },
     ],
   },
 
   {
     path: 'dentistdashboard',
     component: DentistdashboardComponent,
+    canActivate: [AuthGuard], // ✅ Protect dentist dashboard
     children: [
-      { path: '', component: DefaultviewdentistComponent},
-      { path: 'patients', component: PatientsComponent ,},
-      { path: 'patients/patient-details/:patientId', component: PatientDetailsComponent }, // Moved to the same level
-      { path: 'schedule', component: ScheduleComponent},
-      { path: 'walkinrequest', component: WalkinrequestComponent},
-      { path: 'onlinerequest', component: OnlinerequestComponent},
-      { path: 'calendar', component: CalendarComponent},
-      { path: 'prescription', component: PrescriptionComponent},
-      { path: 'treatment', component: TreatmentComponent},
-      { path: 'dentistprofile', component: ProfileComponent }
-    ]
+      { path: '', component: DefaultviewdentistComponent },
+      { path: 'patients', component: PatientsComponent },
+      { path: 'patients/patient-details/:patientId', component: PatientDetailsComponent },
+      { path: 'schedule', component: ScheduleComponent },
+      { path: 'walkinrequest', component: WalkinrequestComponent },
+      { path: 'onlinerequest', component: OnlinerequestComponent },
+      { path: 'calendar', component: CalendarComponent },
+      { path: 'prescription', component: PrescriptionComponent },
+      { path: 'treatment', component: TreatmentComponent },
+      { path: 'dentistprofile', component: ProfileComponent },
+    ],
   },
+
   { path: '**', redirectTo: 'login', pathMatch: 'full' }, // Redirect invalid routes to login
 ];

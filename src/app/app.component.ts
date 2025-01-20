@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { AuthActions } from './auth/ngrx/login.actions';
+import { Store } from '@ngrx/store';
+import { checkTokenExpiry } from './functions/token_expiry';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +13,32 @@ import { HttpClientModule } from '@angular/common/http';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'adminlteapp';
+
+  constructor(
+    private store: Store,
+    private router: Router
+  ){
+
+  }
+
+  ngOnInit() {
+    const refreshToken = localStorage.getItem('refreshToken');
+    checkTokenExpiry(this.store, this.router); // ✅ Call utility function
+    
+    if (!refreshToken) {
+      this.store.dispatch(AuthActions.logout({ refreshToken: '' })); // ✅ Dispatch logout
+      this.router.navigate(['/login']); // ✅ Redirect to login
+      return;
+    }
+
+    // ✅ If refreshToken exists but accessToken is missing, trigger refresh
+    if (!sessionStorage.getItem('accessToken')) {
+      console.log('Session expired - Refreshing access token...');
+      this.store.dispatch(AuthActions.refreshToken({ refreshToken }));
+    }
+
+
+  }
 }

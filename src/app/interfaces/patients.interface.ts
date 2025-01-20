@@ -80,3 +80,6 @@ export interface Schedule {
   endTime: string; // End time of the schedule (e.g., '05:00 PM')
   duration: string; // Duration of the schedule (e.g., '8 hours')
 }
+
+
+
