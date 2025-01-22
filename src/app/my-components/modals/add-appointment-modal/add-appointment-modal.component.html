@@ -1,0 +1,123 @@
+<div *ngIf="isVisible">
+    <div class="modal-backdrop fade show"></div>
+    <div
+      class="modal fade show"
+      [class.d-block]="isVisible"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="addScheduleModalLabel"
+      aria-hidden="true"
+      data-backdrop="static"
+      data-keyboard="false"
+    >
+      <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addScheduleModalLabel">{{ title }}</h5>
+            <button type="button" class="close" aria-label="Close" (click)="close()">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form [formGroup]="appointmentForm">
+              <div class="callout callout-danger">
+                <h5>Please be advised that this is not yet a confirmed appointment.</h5>
+              </div>
+  
+              <!-- Preferred Dentist -->
+<div class="form-group">
+  <label for="dentist-select">Preferred Dentist</label>
+  <ng-select
+    [items]="dentists$ | async"
+    bindLabel="fullname"
+    bindValue="user_id"
+    formControlName="dentist_id"
+    placeholder="Select a Dentist"
+    [searchable]="true"
+  ></ng-select>
+  <div
+    *ngIf="appointmentForm.get('dentist_id')?.invalid && appointmentForm.get('dentist_id')?.touched"
+    class="text-danger"
+  >
+    Dentist selection is required.
+  </div>
+</div>
+
+<!-- Available Dates (Filtered by Dentist) -->
+<div class="form-group">
+  <label for="schedule-select">Available Dates</label>
+  <ng-select
+    [items]="schedules$ | async"
+    bindLabel="date"
+    bindValue="id"
+    formControlName="schedule_id"
+    placeholder="Select a Date"
+    [searchable]="true"
+    [loading]="(isLoading$ | async) ?? false"
+  ></ng-select>
+  <div
+    *ngIf="appointmentForm.get('schedule_id')?.invalid && appointmentForm.get('schedule_id')?.touched"
+    class="text-danger"
+  >
+    Date selection is required.
+  </div>
+</div>
+<!-- Available Time Slots (Filtered by Selected Date) -->
+<div class="form-group">
+  <label for="time-slot-select">Available Time Slots</label>
+  <ng-select
+    [items]="timeSlots$ | async"
+    bindLabel="start_time"
+    bindValue="id"
+    formControlName="time"
+    placeholder="Select a Time Slot"
+    [searchable]="true"
+  ></ng-select>
+  <div
+    *ngIf="appointmentForm.get('time')?.invalid && appointmentForm.get('time')?.touched"
+    class="text-danger"
+  >
+    Time selection is required.
+  </div>
+</div>
+
+  
+              <!-- Services Selection -->
+              <div class="form-group">
+                <label for="services-select">Services:</label>
+                <ng-select
+                  [items]="services"
+                  bindLabel="name"
+                  bindValue="id"
+                  formControlName="services"
+                  [multiple]="true"
+                  placeholder="Select services"
+                ></ng-select>
+                <div
+                  *ngIf="
+                    appointmentForm.get('services')?.invalid &&
+                    appointmentForm.get('services')?.touched
+                  "
+                  class="text-danger"
+                >
+                  At least one service must be selected.
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              [disabled]="!appointmentForm.valid"
+              (click)="submitAppointment()"
+            >
+              Submit
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

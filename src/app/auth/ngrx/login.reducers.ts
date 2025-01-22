@@ -1,11 +1,12 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
 import { AuthActions } from './login.actions';
-import { Token } from 'src/app/interfaces/auth.interfaces';
+import { LoginResponseError, Token } from 'src/app/interfaces/auth.interfaces';
 
 export interface AuthState {
   isLoading: boolean;
   isSubmitting: boolean;
-  loginMessage: string | null;
+  loginMessage: string | null;  // ✅ Success Message
+  loginError: string | null;
   generatedTokens: Token | null;
   refreshError: string | null;
   logoutMessage: string | null;
@@ -15,7 +16,8 @@ export interface AuthState {
 export const initialAuthState: AuthState = {
   isLoading: false,
   isSubmitting: false,
-  loginMessage: null,
+  loginMessage: null, // ✅ Success Message
+  loginError: null,   // ✅ Separate Error Message
   generatedTokens: null,
   refreshError: null,
   logoutMessage: null,
@@ -27,35 +29,50 @@ export const authFeature = createFeature({
   reducer: createReducer(
     initialAuthState,
 
-    // ✅ LOGIN START
-    on(AuthActions.login, (state) => ({
+     // ✅ LOGIN START
+     on(AuthActions.login, (state) => ({
       ...state,
       isLoading: true,
       isSubmitting: true,
-      loginMessage: null,
-      refreshError: null,
+      loginMessage: null, // ✅ Clear previous success message
+      loginError: null,   // ✅ Clear previous error message
     })),
 
-    // ✅ LOGIN SUCCESS
+    // ✅ LOGIN SUCCESS (Store success message)
     on(AuthActions.loginSuccess, (state, { loginResponse }) => ({
       ...state,
-      loginMessage: loginResponse.message,
+      loginMessage: loginResponse.message, // ✅ Store success message
+      loginError: null,                    // ✅ Clear any previous error
       generatedTokens: { 
         accessToken: loginResponse.data.accessToken, 
         refreshToken: loginResponse.data.refreshToken 
       },
       isLoading: false,
       isSubmitting: false,
-      refreshError: null,
     })),
 
-    // ✅ LOGIN FAILURE
-    on(AuthActions.loginFailure, (state, { error }) => ({
+    // ✅ LOGIN FAILURE (Store error message separately)
+    on(AuthActions.loginFailure, (state, { loginResponseError }) => ({
       ...state,
       isLoading: false,
       isSubmitting: false,
-      loginMessage: error,
+      loginMessage: null,  
+      loginError: loginResponseError.message, // ✅ Store only the string
     })),
+
+        // ✅ Clear login message
+    on(AuthActions.clearMessage, (state) => ({
+      ...state,
+      loginMessage: null
+    })),
+
+    // ✅ Clear login error
+    on(AuthActions.clearError, (state) => ({
+      ...state,
+      loginError: null
+    })),
+    
+    
 
     // ✅ REFRESH TOKEN START
     on(AuthActions.refreshToken, (state) => ({
@@ -113,6 +130,7 @@ export const {
   selectIsSubmitting,
   selectIsLoading,
   selectLoginMessage,
+  selectLoginError,
   selectGeneratedTokens,
   selectRefreshError,
   selectLogoutMessage,

@@ -1,3 +1,21 @@
+<!-- ✅ Success Alert (Auto-dismiss after 3 seconds) -->
+<div class="alert-container" *ngIf="(loginMessage$ | async) as loginMessage">
+  <div class="alert alert-success alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h5><i class="icon fas fa-check"></i> Success!</h5>
+    {{ loginMessage }}
+  </div>
+</div>
+
+<!-- ✅ Error Alert (Auto-dismiss after 3 seconds) -->
+<div class="alert-container" *ngIf="(loginError$ | async) as loginError">
+  <div class="alert alert-danger alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h5><i class="icon fas fa-ban"></i> Error!</h5>
+    {{ loginError }}
+  </div>
+</div>
+
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
   <div class="content">
     <div class="row">

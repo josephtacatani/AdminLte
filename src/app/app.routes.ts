@@ -19,6 +19,8 @@ import { AppointmentComponent } from './dashboard/patientdashboard/appointment/a
 import { UserprofileComponent } from './dashboard/patientdashboard/userprofile/userprofile.component';
 import { AuthGuard } from './services/auth/auth.guard';
 import { LoginGuard } from './services/auth/login.guard';
+import { HealthDeclarationComponent } from './dashboard/patientdashboard/health_declaration/health_declaration.component';
+import { PatientTreatmentComponent } from './dashboard/patientdashboard/patient_treatment/patient_treatment.component';
 
 
 
@@ -34,6 +36,8 @@ export const routes: Routes = [
       { path: '', component: DefaultviewComponent }, // Default view for /patientdashboard
       { path: 'appointment', component: AppointmentComponent },
       { path: 'userprofile', component: UserprofileComponent },
+      { path: 'healthdeclaration', component: HealthDeclarationComponent },
+      { path: 'treatment', component: PatientTreatmentComponent },
     ],
   },
 

@@ -7,6 +7,10 @@ export interface LoginRequest {
     message: string;
     data: Token;
   }
+
+  export interface LoginResponseError{
+    message: string;
+  }
   
   export interface Token {
     accessToken: string;

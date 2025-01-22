@@ -1,13 +1,13 @@
-export function decodeAccessToken(): any {
-    const token = sessionStorage.getItem('accessToken');
-    if (!token) return null;
-  
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1])); // ✅ Decode JWT payload
-      return payload; // Returns { id: "123", role: "patient" }
-    } catch (e) {
-      console.error('Invalid token:', e);
-      return null;
-    }
+import { jwtDecode } from 'jwt-decode';
+
+export function decodeAccessToken(): { id: number; role: string } | null {
+  const token = sessionStorage.getItem('accessToken');
+  if (!token) return null;
+
+  try {
+    return jwtDecode<{ id: number; role: string }>(token); // ✅ Correct import
+  } catch (error) {
+    console.error('Invalid token:', error);
+    return null;
   }
-  
+}

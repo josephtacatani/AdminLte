@@ -12,6 +12,12 @@ import { authFeatureKey, authReducer } from './auth/ngrx/login.reducers';
 import { AuthEffects } from './auth/ngrx/login.effects';
 import { profileFeatureKey, profileReducer } from './ngrx/user_profile/user_profile.reducers';
 import { ProfileEffects } from './ngrx/user_profile/user_profile.effects';
+import { patientsFeatureKey, patientsReducer } from './ngrx/patients/patients.reducers';
+import { PatientsEffects } from './ngrx/patients/patients.effects';
+import { dentistFeatureKey, dentistReducer } from './ngrx/dentist/dentist.reducers';
+import { DentistEffects } from './ngrx/dentist/dentist.effects';
+import { scheduleFeatureKey, scheduleReducer } from './ngrx/schedules/schedules.reducers';
+import { ScheduleEffects } from './ngrx/schedules/schedules.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -20,9 +26,18 @@ export const appConfig: ApplicationConfig = {
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
     provideStore({
       [authFeatureKey]: authReducer,
-      [profileFeatureKey]: profileReducer
+      [profileFeatureKey]: profileReducer,
+      [patientsFeatureKey]: patientsReducer,
+      [dentistFeatureKey]: dentistReducer,
+      [scheduleFeatureKey]: scheduleReducer
     }),
-    provideEffects([AuthEffects, ProfileEffects]),  // <-- Ensure AuthEffects is provided
+    provideEffects([
+      AuthEffects, 
+      ProfileEffects, 
+      PatientsEffects, 
+      DentistEffects,
+      ScheduleEffects
+    ]),  // <-- Ensure AuthEffects is provided
     provideStoreDevtools({
       maxAge: 25,
       logOnly: environment.production, // or !isDevMode()

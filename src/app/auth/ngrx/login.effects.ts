@@ -6,12 +6,12 @@ import { AuthService } from 'src/app/services/auth/auth.service';
 import { AuthActions } from './login.actions';
 import { ProfileActions } from 'src/app/ngrx/user_profile/user_profile.actions';
 import { Store } from '@ngrx/store';
+import { LoginResponseError } from 'src/app/interfaces/auth.interfaces';
 
 @Injectable()
 export class AuthEffects {
   constructor(private actions$: Actions, private authService: AuthService, private router: Router, private store: Store) {}
 
-  // ✅ Handle Login Effect
   // ✅ Handle Login Effect
   login$ = createEffect(() =>
     this.actions$.pipe(
@@ -21,18 +21,26 @@ export class AuthEffects {
           map(response => {
             const expiresInMinutes = 15; // Adjust based on backend expiry time
             const expiresAt = Date.now() + expiresInMinutes * 60 * 1000; // Calculate expiration time
-
-            sessionStorage.setItem('accessToken', response.data.accessToken); // ✅ Store access token in sessionStorage
-            sessionStorage.setItem('accessTokenExpiry', expiresAt.toString()); // ✅ Store expiration time
-            localStorage.setItem('refreshToken', response.data.refreshToken ?? ''); // ✅ Store refresh token in localStorage
-            
+  
+            sessionStorage.setItem('accessToken', response.data.accessToken);
+            sessionStorage.setItem('accessTokenExpiry', expiresAt.toString());
+            localStorage.setItem('refreshToken', response.data.refreshToken ?? '');
+  
             return AuthActions.loginSuccess({ loginResponse: response });
           }),
-          catchError(error => of(AuthActions.loginFailure({ error: error.message || 'Login failed' })))
+          catchError(error => {
+            const errorMessage: LoginResponseError = {
+              message: error.error.message || 'Login failed' // ✅ Store as an object
+            };
+            return of(AuthActions.loginFailure({ loginResponseError: errorMessage }));
+          })
         )
       )
     )
   );
+  
+  
+  
 
   // ✅ Fetch Profile After Login Success (tap used for side-effect)
   fetchProfileAfterLogin$ = createEffect(() =>
@@ -80,7 +88,7 @@ export class AuthEffects {
     )
   );
 
-  // ✅ Handle Refresh Token Effect
+  //✅ Handle Refresh Token Effect
   refreshToken$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.refreshToken),

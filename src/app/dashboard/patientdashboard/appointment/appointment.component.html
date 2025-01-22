@@ -27,57 +27,76 @@
         This questionnaire is designed with your safety in mind and must be answered honestly. Your answers will be reviewed prior to your appointment, and a member of our team will contact you if we recommend rescheduling to a later date. An answer of YES does not exclude you from treatment. Please answer YES or NO to each of the following questions. Thank you for your consideration and understanding.
       </p>
       <div class="row">
-        <!-- Preferred Dentist -->
-        <div class="col-md-4">
-          <div class="form-group">
-            <label for="dentist-select">Preferred Dentist</label>
-            <select id="dentist-select" class="form-control select2" style="width: 100%;">
-              <option *ngFor="let dentist of dentists" [value]="dentist">{{ dentist }}</option>
-            </select>
-          </div>
-        </div>
-        <!-- Appointment Date -->
-        <div class="col-md-4">
-          <div class="form-group">
-            <label for="reservationdate">Date:</label>
-            <div class="input-group date" id="reservationdate" data-target-input="nearest">
-              <input
-                type="text"
-                id="reservationdate"
-                class="form-control datetimepicker-input"
-                data-target="#reservationdate"
-              />
-              <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-                <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+
+        <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+          <div class="col-md-8">
+            <div class="card card-default">
+              <div class="card-header">
+                <h3 class="card-title">Set an Appointment</h3>
+              </div>
+              <div class="card-body">
+                <div class="callout callout-danger">
+                  <h5>Please be advised that this is not yet a confirmed appointment.</h5>
+                </div>
+        
+                <!-- Preferred Dentist (Single Select with Search) -->
+                <div class="form-group">
+                  <label for="dentist-select">Preferred Dentist</label>
+                  <ng-select [items]="dentists$ | async"
+                             bindLabel="fullname"
+                             bindValue="user_id"
+                             formControlName="dentist_id"
+                             placeholder="Select a Dentist"
+                             [searchable]="true">
+                  </ng-select>
+                  <div *ngIf="appointmentForm.get('dentist_id')?.invalid && appointmentForm.get('dentist_id')?.touched" class="text-danger">
+                    Dentist selection is required.
+                  </div>
+                </div>
+        
+                <!-- Appointment Date -->
+                <div class="form-group">
+                  <label for="appointment-date">Date:</label>
+                  <input type="date" id="appointment-date" class="form-control" formControlName="date" />
+                  <div *ngIf="appointmentForm.get('date')?.invalid && appointmentForm.get('date')?.touched" class="text-danger">
+                    Date is required.
+                  </div>
+                </div>
+        
+                <!-- Appointment Time -->
+                <div class="form-group">
+                  <label for="appointment-time">Time:</label>
+                  <input type="time" id="appointment-time" class="form-control" formControlName="time" />
+                  <div *ngIf="appointmentForm.get('time')?.invalid && appointmentForm.get('time')?.touched" class="text-danger">
+                    Time is required.
+                  </div>
+                </div>
+        
+                <!-- Services Selection (Multi-Select with Search) -->
+                <div class="form-group">
+                  <label for="services-select">Services:</label>
+                  <ng-select [items]="services"
+                             bindLabel="name"
+                             bindValue="id"
+                             formControlName="services"
+                             [multiple]="true"
+                             placeholder="Select services">
+                  </ng-select>
+                  <div *ngIf="appointmentForm.get('services')?.invalid && appointmentForm.get('services')?.touched" class="text-danger">
+                    At least one service must be selected.
+                  </div>
+                </div>
+        
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary" [disabled]="appointmentForm.invalid">Submit</button>
               </div>
             </div>
           </div>
-        </div>
-        <!-- Appointment Time -->
-        <div class="col-md-4">
-          <div class="form-group">
-            <label for="timepicker">Time:</label>
-            <div class="input-group date" id="timepicker" data-target-input="nearest">
-              <input
-                type="text"
-                id="timepicker"
-                class="form-control datetimepicker-input"
-                data-target="#timepicker"
-              />
-              <div class="input-group-append" data-target="#timepicker" data-toggle="datetimepicker">
-                <div class="input-group-text"><i class="far fa-clock"></i></div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-12">
-          <div class="form-group">
-            <label>Service</label>
-            <select class="select2" multiple="multiple" data-placeholder="Select a Service" style="width: 100%;">
-              <option *ngFor="let service of services" [value]="service">{{ service }}</option>
-            </select>
-          </div>
-        </div>
+        </form>
+        
+        
+        
+        
       </div>
     </div>
   </div>
