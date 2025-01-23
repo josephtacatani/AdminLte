@@ -12,6 +12,7 @@ import { Schedule, ScheduleResponse, SchedulesResponse, TimeSlotsResponse } from
 export class SchedulesService {
   private apiUrl = `${environment.apiUrl}/schedules`; // ✅ Ensure correct endpoint
   private timeSlotsUrl = `${environment.apiUrl}/timeslots/available`; // ✅ Ensure correct endpoint
+  private timeAllSlotsUrl = `${environment.apiUrl}/timeslots/all`; // ✅ Ensure correct endpoint
 
 
   constructor(private http: HttpClient) {}
@@ -38,5 +39,13 @@ export class SchedulesService {
 
   getTimeSlots(scheduleId: number): Observable<TimeSlotsResponse> {
     return this.http.get<TimeSlotsResponse>(`${this.timeSlotsUrl}/${scheduleId}`);
+  }
+
+  getAllTimeSlots(): Observable<TimeSlotsResponse> {
+    return this.http.get<TimeSlotsResponse>(this.timeAllSlotsUrl);
+  }
+
+  getAllTimeSlotsById(scheduleId: number): Observable<TimeSlotsResponse> {
+    return this.http.get<TimeSlotsResponse>(`${this.timeAllSlotsUrl}/${scheduleId}`);
   }
 }

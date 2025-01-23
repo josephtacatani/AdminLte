@@ -105,5 +105,38 @@ export class ScheduleEffects {
       )
     )
   );
+
+  loadAllTimeSlots$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ScheduleActions.loadAllTimeSlots),
+      mergeMap(() =>
+        this.scheduleService.getAllTimeSlots().pipe(
+          map((timeSlotsResponse) =>
+            ScheduleActions.loadAllTimeSlotsSuccess({ timeSlotsResponse })
+          ),
+          catchError((error) =>
+            of(ScheduleActions.loadAllTimeSlotsFailure({ error: error.message }))
+          )
+        )
+      )
+    )
+  );
+
+  loadAllTimeSlotsById$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ScheduleActions.loadAllTimeSlotsById),
+      mergeMap(({ scheduleId }) =>
+        this.scheduleService.getAllTimeSlotsById(scheduleId).pipe(
+          map((timeSlotsResponse) =>
+            ScheduleActions.loadAllTimeSlotsByIdSuccess({ timeSlotsResponse })
+          ),
+          catchError((error) =>
+            of(ScheduleActions.loadAllTimeSlotsByIdFailure({ error: error.message }))
+          )
+        )
+      )
+    )
+  );
+  
   
 }

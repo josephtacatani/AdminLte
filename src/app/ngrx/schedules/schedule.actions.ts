@@ -29,5 +29,13 @@ export const ScheduleActions = createActionGroup({
     'Load Time Slots': props<{ scheduleId: number }>(),
     'Load Time Slots Success': props<{ timeSlotsResponse: TimeSlotsResponse }>(),
     'Load Time Slots Failure': props<{ error: string }>(),
+
+    'Load All Time Slots By Id': props<{ scheduleId: number }>(),
+    'Load All Time Slots By Id Success': props<{ timeSlotsResponse: TimeSlotsResponse }>(),
+    'Load All Time Slots By Id Failure': props<{ error: string }>(),
+
+    'Load All Time Slots': emptyProps(),
+    'Load All Time Slots Success': props<{ timeSlotsResponse: TimeSlotsResponse }>(),
+    'Load All Time Slots Failure': props<{ error: string }>(),
   }
 });

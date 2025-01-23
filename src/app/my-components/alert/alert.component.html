@@ -1,0 +1,17 @@
+<div *ngIf="message" class="alert-container">
+    <div class="alert alert-{{ type }} alert-dismissible">
+      <button type="button" class="close" (click)="closeAlert()" aria-hidden="true">
+        &times;
+      </button>
+      <h5>
+        <i class="icon fas" [ngClass]="{
+          'fa-check': type === 'success',
+          'fa-ban': type === 'danger',
+          'fa-exclamation-triangle': type === 'warning'
+        }"></i>
+        {{ type | titlecase }}!
+      </h5>
+      {{ message }}
+    </div>
+  </div>
+  

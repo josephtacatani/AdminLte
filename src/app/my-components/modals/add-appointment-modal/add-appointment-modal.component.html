@@ -120,4 +120,11 @@
       </div>
     </div>
   </div>
+
+  <!-- ✅ Success Alert -->
+<app-alert [message]="message$ | async" type="success"></app-alert>
+
+<!-- ❌ Error Alert -->
+<app-alert [message]="error$ | async" type="danger"></app-alert>
+
   

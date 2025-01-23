@@ -3,42 +3,67 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import 'datatables.net';
 import 'datatables.net-bs4';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { Patient } from 'src/app/interfaces/patient_details.interface';
 import { select, Store } from '@ngrx/store';
 import { selectError, selectPatients, selectSelectedPatient } from 'src/app/ngrx/patients/patients.reducers';
 import { decodeAccessToken } from 'src/app/services/auth/auth.utils';
 import { PatientsActions } from 'src/app/ngrx/patients/patients.actions';
 import { AddAppointmentModalComponent } from 'src/app/my-components/modals/add-appointment-modal/add-appointment-modal.component';
+import { Appointment } from 'src/app/interfaces/addappointment.interface';
+import { selectSelectedAppointment, selectSelectedAppointmentPatient } from 'src/app/ngrx/appointment/addappointment.reducers';
+import { AppointmentActions } from 'src/app/ngrx/appointment/addappointment.actions';
+import { Dentist } from 'src/app/interfaces/dentist.interface';
+import { Schedule, TimeSlot } from 'src/app/interfaces/schedule.interface';
+import { selectSchedules, selectSelectedSchedule, selectTimeSlots, selectTimeSlotsById } from 'src/app/ngrx/schedules/schedules.reducers';
+import { selectDentists, selectSelectedDentist } from 'src/app/ngrx/dentist/dentist.reducers';
+import { ConfirmModalComponent } from 'src/app/my-components/modals/confirm-modal/confirm-modal.component';
 declare var $: any;
 
 @Component({
   selector: 'app-defaultview',
   standalone: true,
-  imports: [CommonModule, AddAppointmentModalComponent],
+  imports: [CommonModule, AddAppointmentModalComponent, ConfirmModalComponent],
   templateUrl: './defaultview.component.html',
   styleUrls: ['./defaultview.component.scss']
 })
 export class DefaultviewComponent implements AfterViewInit, OnInit {
   isAddAppointmentModalVisible: boolean = false;
-  
+  selectedAppointmentId: number | null = null;
+  isCancelModalVisible = false;
+  patient$!: Observable<Patient | null>;
+  error$!: Observable<string | null>;
+  patients$!: Observable<Patient[] | null>;
+  appointments$!: Observable<Appointment | null>;
+  schedule$: Observable<Schedule | null> = this.store.pipe(select(selectSelectedSchedule));
+  dentist$: Observable<Dentist | null> = this.store.pipe(select(selectSelectedDentist));
+  timeslots$: Observable<TimeSlot[]> = this.store.pipe(select(selectTimeSlotsById));
+
+
   constructor(private store: Store, private router: Router) {
     this.patient$ = this.store.pipe(select(selectSelectedPatient));
     this.patients$ = this.store.pipe(select(selectPatients));
     this.error$ = this.store.pipe(select(selectError));
+    this.appointments$ = this.store.pipe(select(selectSelectedAppointmentPatient));
 
+    
   }
 
-  patient$!: Observable<Patient | null>;
-  error$!: Observable<string | null>;
-  patients$!: Observable<Patient[] | null>;
+    // ✅ Extracting specific fields
+    startTime$: Observable<string> = this.schedule$.pipe(
+      map(schedule => schedule?.start_time || 'N/A')
+    );
 
+    date$: Observable<string> = this.schedule$.pipe(
+      map(schedule => schedule?.date || 'N/A')
+    );
+  
+    dentistName$: Observable<string> = this.dentist$.pipe(
+      map(dentist => dentist?.fullname || 'N/A')
+    );
 
-  appointmentData = {
-    date: '2021-12-31',
-    time: '09:00 AM',
-    status: 'pending'
-  };
+    
+
 
   // tableData = [
   //   { date: '2023-10-01', time: '10:00 AM', doctor: 'Dr. John Smith', status: 'Confirmed' },
@@ -125,12 +150,18 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
   }
 
   ngOnInit(): void {
-        const userData = decodeAccessToken();
+
+    
+    const userData = decodeAccessToken();
     if (userData?.id) {
       this.store.dispatch(PatientsActions.loadPatient({ id: userData.id })); // ✅ Fetch patient using ID from JWT
+      
+      this.store.dispatch(AppointmentActions.loadAppointmentByPatientId({id: userData.id }));
     } else {
       console.warn('No user ID found in token!');
     }
+
+
   }
 
   navigateToAppointment(): void {
@@ -138,7 +169,7 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
   }
 
   cancelAppointment(): void {
-    this.appointmentData.status = 'cancelled';
+    // this.appointmentData.status = 'cancelled';
   }
 
   openAddAppointmentModal(): void {
@@ -151,5 +182,26 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
 
   handleAddAppointment(){
 
+  }
+
+  openConfirmModal(): void {
+    this.isCancelModalVisible = true;
+  }
+
+  /** ✅ Open the confirmation modal and store `appointmentId` */
+  openCancelModal(appointmentId: number | null): void {
+    if (appointmentId !== null) {
+      this.selectedAppointmentId = appointmentId;
+      this.isCancelModalVisible = true;
+    }
+  }
+
+  /** ✅ Confirm cancellation and dispatch action */
+  confirmCancelAppointment(): void {
+    if (this.selectedAppointmentId !== null) {
+      this.store.dispatch(AppointmentActions.cancelAppointment({ id: this.selectedAppointmentId }));
+      this.isCancelModalVisible = false; // ✅ Close modal after action
+      this.selectedAppointmentId = null; // ✅ Reset selection
+    }
   }
 }

@@ -9,6 +9,8 @@ export interface ScheduleState {
   error: string | null;
   deleteMessage: string | null;
   timeSlots: TimeSlot[];
+  allTimeSlots: TimeSlot[]; // ✅ Added for all timeslots
+  timeSlotsById: TimeSlot[];
 }
 
 export const initialScheduleState: ScheduleState = {
@@ -18,6 +20,8 @@ export const initialScheduleState: ScheduleState = {
   error: null,
   deleteMessage: null,
   timeSlots: [],
+  allTimeSlots: [],// ✅ Added for all timeslots
+  timeSlotsById: []
 };
 
 export const scheduleFeature = createFeature({
@@ -134,7 +138,44 @@ export const scheduleFeature = createFeature({
       ...state,
       isLoading: false,
       error,
-    }))
+    })),
+    // ✅ Load all time slots
+on(ScheduleActions.loadAllTimeSlots, (state) => ({
+  ...state,
+  isLoading: true,
+  error: null,
+})),
+on(ScheduleActions.loadAllTimeSlotsSuccess, (state, { timeSlotsResponse }) => ({
+  ...state,
+  isLoading: false,
+  allTimeSlots: timeSlotsResponse.data, // Store all timeslots
+  error: null,
+})),
+on(ScheduleActions.loadAllTimeSlotsFailure, (state, { error }) => ({
+  ...state,
+  isLoading: false,
+  error,
+})),
+
+// ✅ Load all time slots by schedule ID
+on(ScheduleActions.loadAllTimeSlotsById, (state) => ({
+  ...state,
+  isLoading: true,
+  error: null,
+})),
+on(ScheduleActions.loadAllTimeSlotsByIdSuccess, (state, { timeSlotsResponse }) => ({
+  ...state,
+  isLoading: false,
+  timeSlotsById: timeSlotsResponse.data, // ✅ Store timeslots for the given schedule ID
+  error: null,
+})),
+on(ScheduleActions.loadAllTimeSlotsByIdFailure, (state, { error }) => ({
+  ...state,
+  isLoading: false,
+  error,
+})),
+
+    
 
   ),
 });
@@ -147,5 +188,7 @@ export const {
   selectSelectedSchedule,
   selectError,
   selectDeleteMessage,
-  selectTimeSlots
+  selectTimeSlots,
+  selectAllTimeSlots,
+  selectTimeSlotsById
 } = scheduleFeature;
