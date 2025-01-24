@@ -1,0 +1,72 @@
+<!-- ✅ Success Alert (Auto-dismiss after 3 seconds) -->
+<div class="alert-container" *ngIf="(loginMessage$ | async) as loginMessage">
+  <div class="alert alert-success alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h5><i class="icon fas fa-check"></i> Success!</h5>
+    {{ loginMessage }}
+  </div>
+</div>
+
+<!-- ✅ Error Alert (Auto-dismiss after 3 seconds) -->
+<div class="alert-container" *ngIf="(loginError$ | async) as loginError">
+  <div class="alert alert-danger alert-dismissible">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h5><i class="icon fas fa-ban"></i> Error!</h5>
+    {{ loginError }}
+  </div>
+</div>
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="content">
+    <div class="row">
+      <div class="col-lg-12 col-md-10 col-sm-8">
+        <div class="card card-primary card-outline">
+          <div class="card-body">
+            <h1 class="card-title">Somosot Dental</h1>
+            <p class="card-text">Sign In</p>
+
+            <!-- ✅ Reactive Form -->
+            <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+
+              <!-- ✅ Email Field -->
+              <div class="input-group mb-3">
+                <input type="email" class="form-control" placeholder="Email" formControlName="email">
+                <div class="input-group-append">
+                  <span class="input-group-text"><i class="fa fa-envelope"></i></span>
+                </div>
+              </div>
+              <div *ngIf="loginForm.controls['email']?.invalid && loginForm.controls['email']?.touched" class="text-danger">
+                <small *ngIf="loginForm.controls['email']?.errors?.['required']">Email is required.</small>
+                <small *ngIf="loginForm.controls['email']?.errors?.['email']">Enter a valid email.</small>
+              </div>
+
+              <!-- ✅ Password Field -->
+              <div class="input-group mb-3">
+                <input type="password" class="form-control" placeholder="Password" formControlName="password">
+                <div class="input-group-append">
+                  <span class="input-group-text"><i class="fa fa-lock"></i></span>
+                </div>
+              </div>
+              <div *ngIf="loginForm.controls['password']?.invalid && loginForm.controls['password']?.touched" class="text-danger">
+                <small *ngIf="loginForm.controls['password']?.errors?.['required']">Password is required.</small>
+                <small *ngIf="loginForm.controls['password']?.errors?.['minlength']">Password must be at least 6 characters.</small>
+              </div>
+
+              <!-- ✅ Submit Button -->
+              <button type="submit" class="btn btn-block btn-primary" [disabled]="loginForm.invalid">
+                Login
+              </button>
+
+            </form>
+
+            <div class="d-flex flex-column mt-3">
+              <a href="#" class="text-primary custom-link">Forgot password?</a>
+              <a href="#" class="text-primary custom-link">Create Account?</a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

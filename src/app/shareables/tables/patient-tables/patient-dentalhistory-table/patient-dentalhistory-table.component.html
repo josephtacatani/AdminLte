@@ -1,0 +1,23 @@
+<app-table-with-edit-delete
+  [data]="filteredDentalHistoryData"
+  [columns]="columns"
+  [itemsPerPage]="itemsPerPage"
+  [(currentPage)]="currentPage"
+  [(searchTerm)]="searchTerm"
+  [pageSizeOptions]="[5, 10, 15, 20]"
+  [showAddButton]="true"
+  (searchTermChange)="filterDentalHistoryData($event)"
+  (currentPageChange)="currentPage = $event"
+  (sort)="sortDentalHistoryData($event)"
+  (actionClick)="handleActionClick($event)"
+  (add)="openAddEditModal()"
+></app-table-with-edit-delete>
+
+<!-- Add/Edit Dental History Modal -->
+<app-add-edit-dental-history
+  [isVisible]="isAddEditModalVisible"
+  [title]="modalTitle"
+  [dentalHistoryData]="selectedDentalHistory"
+  (closeModal)="closeAddDentalHistoryModal()"
+  (submitModal)="handleDentalHistorySubmit($event)"
+></app-add-edit-dental-history>

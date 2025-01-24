@@ -1,0 +1,61 @@
+<!-- Add Dental History Modal -->
+<div *ngIf="isVisible">
+  <div class="modal-backdrop fade show"></div> <!-- Backdrop -->
+  <div
+    class="modal fade show"
+    [class.d-block]="isVisible"
+    tabindex="-1"
+    role="dialog"
+    aria-labelledby="addDentalHistoryModalLabel"
+    aria-hidden="true"
+    data-backdrop="static"
+    data-keyboard="false"
+  >
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addDentalHistoryModalLabel">{{ title }}</h5>
+          <button type="button" class="close" aria-label="Close" (click)="close()">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="dentalHistoryForm" (ngSubmit)="submitDentalHistory()">
+            <div class="form-group">
+              <label for="previousDentist">Previous Dentist <span class="text-danger">*</span></label>
+              <input
+                type="text"
+                class="form-control"
+                id="previousDentist"
+                formControlName="previousDentist"
+                [attr.aria-required]="true"
+                [attr.aria-invalid]="dentalHistoryForm.get('previousDentist')?.invalid"
+              />
+              <div *ngIf="dentalHistoryForm.get('previousDentist')?.hasError('required') && dentalHistoryForm.get('previousDentist')?.touched" class="text-danger">
+                Previous Dentist is required.
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="lastDentalVisit">Last Dental Visit <span class="text-danger">*</span></label>
+              <input
+                type="date"
+                class="form-control"
+                id="lastDentalVisit"
+                formControlName="lastDentalVisit"
+                [attr.aria-required]="true"
+                [attr.aria-invalid]="dentalHistoryForm.get('lastDentalVisit')?.invalid"
+              />
+              <div *ngIf="dentalHistoryForm.get('lastDentalVisit')?.hasError('required') && dentalHistoryForm.get('lastDentalVisit')?.touched" class="text-danger">
+                Last Dental Visit is required.
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
+              <button type="submit" class="btn btn-primary" [disabled]="dentalHistoryForm.invalid">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

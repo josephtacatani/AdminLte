@@ -1,0 +1,23 @@
+<app-table-with-edit-delete
+  [data]="filteredmedicalHistoryData"
+  [columns]="columns"
+  [itemsPerPage]="itemsPerPage"
+  [(currentPage)]="currentPage"
+  [(searchTerm)]="searchTerm"
+  [pageSizeOptions]="[5, 10, 15, 20]"
+  [showAddButton]="true"
+  (searchTermChange)="filtermedicalHistoryData($event)"
+  (currentPageChange)="currentPage = $event"
+  (sort)="sortmedicalHistoryData($event)"
+  (actionClick)="handleActionClick($event)"
+  (add)="openAddMedicalHistoryModal()"
+></app-table-with-edit-delete>
+
+<!-- Add/Edit Dental History Modal -->
+<app-add-edit-medical-history
+  [isVisible]="isAddMedicalHistoryModalVisible"
+  [title]="modalTitle"
+  [medicalHistoryData]="selectedMedicalHistory"
+  (closeModal)="closeAddMedicalHistoryModal()"
+  (submitModal)="handleDentalHistorySubmit($event)"
+></app-add-edit-medical-history>

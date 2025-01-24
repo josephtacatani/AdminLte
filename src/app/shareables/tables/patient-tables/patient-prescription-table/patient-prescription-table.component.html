@@ -1,0 +1,15 @@
+<section>
+    <app-display-table
+    [data]="filteredPrescriptionData"
+    [columns]="columns"
+    [itemsPerPage]="itemsPerPage"
+    [(currentPage)]="currentPage"
+    [(searchTerm)]="searchTerm"
+    [pageSizeOptions]="[5, 10, 15, 20]"
+    [showAddButton]="false"
+    (searchTermChange)="filterprescriptionData($event)"
+    (currentPageChange)="currentPage = $event"
+    (sort)="sortprescriptionData($event)"
+  ></app-display-table>
+  </section>
+  

@@ -1,0 +1,138 @@
+{
+  "patients": [
+    {
+      "id": "1",
+      "patientId": 322,
+      "photo": "https://example.com/photos/patient1.jpg",
+      "name": "John Doe",
+      "birthday": "1990-01-01",
+      "gender": "Male",
+      "contact": "123-456-7890",
+      "email": "johndoe@example.com",
+      "address": "123 Elm Street, Springfield, IL"
+    },
+    {
+      "id": "2",
+      "patientId": 855,
+      "photo": "https://example.com/photos/patient2.jpg",
+      "name": "Jane Smith",
+      "birthday": "1992-05-20",
+      "gender": "Female",
+      "contact": "987-654-3210",
+      "email": "janesmith@example.com",
+      "address": "456 Oak Avenue, Springfield, IL"
+    }
+  ],
+  "appointmentDetails": [
+    {
+      "id": "1",
+      "patientId": 322,
+      "date": "2023-10-01",
+      "time": "10:00 AM",
+      "doctor": "Dr. Jane Doe",
+      "status": "Confirmed"
+    },
+    {
+      "id": "2",
+      "patientId": 322,
+      "date": "2023-10-02",
+      "time": "11:00 AM",
+      "doctor": "Dr. Jane Doe",
+      "status": "Pending"
+    }
+  ],
+  "prescriptions": [
+    {
+      "id": "1",
+      "patientId": 322,
+      "date": "2023-01-01",
+      "medicine": "Medicine A",
+      "notes": "Take twice daily"
+    },
+    {
+      "id": "2",
+      "patientId": 322,
+      "date": "2023-01-02",
+      "medicine": "Medicine B",
+      "notes": "Take once daily"
+    }
+  ],
+  "treatments": [
+    {
+      "id": "1",
+      "patientId": 1,
+      "dateVisit": "2023-10-01",
+      "teethNos": "12, 14",
+      "treatment": "Filling",
+      "description": "Composite filling",
+      "fees": "$200",
+      "remarks": "Follow-up in 6 months"
+    },
+    {
+      "id": "2",
+      "patientId": 2,
+      "dateVisit": "2023-10-15",
+      "teethNos": "22",
+      "treatment": "Extraction",
+      "description": "Tooth extraction",
+      "fees": "$150",
+      "remarks": "Healing well"
+    }
+  ],
+  "dentalHistories": [
+    {
+      "id": "2",
+      "previousDentist": "dsdsdsd",
+      "lastDentalVisit": "2022-11-15"
+    },
+    {
+      "id": "3",
+      "patientId": 322,
+      "previousDentist": "Dr. Jane Doe",
+      "lastDentalVisit": "2022-11-15",
+      "action": "View"
+    }
+  ],
+  "medicalHistories": [
+    {
+      "id": "1",
+      "condition": null,
+      "symptoms": null,
+      "lastVisitDate": null,
+      "ongoingTreatment": null,
+      "medicationDetails": null,
+      "allergies": "Peanuts",
+      "illnesses": "Asthma",
+      "action": "View"
+    },
+    {
+      "id": "2",
+      "condition": null,
+      "symptoms": null,
+      "lastVisitDate": null,
+      "ongoingTreatment": null,
+      "medicationDetails": null,
+      "allergies": "Penicillin",
+      "illnesses": "Diabetes",
+      "action": "View"
+    }
+  ],
+  "schedules": [
+    {
+      "id": "1",
+      "date": "2023-10-01",
+      "startTime": "09:00 AM",
+      "endTime": "05:00 PM",
+      "duration": "8 hours"
+
+    },
+    {
+      "id": "2",
+      "date": "2023-10-02",
+      "startTime": "10:00 AM",
+      "endTime": "04:00 PM",
+      "duration": "6 hours"
+ 
+    }
+  ]
+}

@@ -1,0 +1,423 @@
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6"></div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right"></ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Health Declaration Form -->
+<div class="col-md-12">
+  <div class="card card-default">
+    <div class="card-header">
+      <h3 class="card-title">Health Declaration</h3>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="healthDeclarationForm" (ngSubmit)="onSubmit()">
+        <!-- Question 1 -->
+        <div class="form-group">
+          <label>Do you have a fever or temperature over 38 °C?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="fever-yes"
+              formControlName="fever"
+              value="yes"
+            />
+            <label class="form-check-label" for="fever-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="fever-no"
+              formControlName="fever"
+              value="no"
+            />
+            <label class="form-check-label" for="fever-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('fever')?.invalid && healthDeclarationForm.get('fever')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+        <!-- Repeat for other questions -->
+        <div class="form-group">
+          <label>Have you experienced shortness of breath or had trouble breathing?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="breathing-yes"
+              formControlName="breathing"
+              value="yes"
+            />
+            <label class="form-check-label" for="breathing-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="breathing-no"
+              formControlName="breathing"
+              value="no"
+            />
+            <label class="form-check-label" for="breathing-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('breathing')?.invalid && healthDeclarationForm.get('breathing')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+        <!-- Add remaining questions similarly -->
+        <!-- Question: Cough -->
+        <div class="form-group">
+          <label>Do you have a dry cough?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="cough-yes"
+              formControlName="cough"
+              value="yes"
+            />
+            <label class="form-check-label" for="cough-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="cough-no"
+              formControlName="cough"
+              value="no"
+            />
+            <label class="form-check-label" for="cough-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('cough')?.invalid && healthDeclarationForm.get('cough')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+                <!-- Question: Runny Nose -->
+        <div class="form-group">
+          <label>Do you have a runny nose?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="nose-yes"
+              formControlName="nose"
+              value="yes"
+            />
+            <label class="form-check-label" for="nose-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="nose-no"
+              formControlName="nose"
+              value="no"
+            />
+            <label class="form-check-label" for="nose-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('nose')?.invalid && healthDeclarationForm.get('nose')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+        <!-- Question: Sense of Smell -->
+        <div class="form-group">
+          <label>Have you recently lost or had a reduction in your sense of smell?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="smell-yes"
+              formControlName="smell"
+              value="yes"
+            />
+            <label class="form-check-label" for="smell-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="smell-no"
+              formControlName="smell"
+              value="no"
+            />
+            <label class="form-check-label" for="smell-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('smell')?.invalid && healthDeclarationForm.get('smell')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+        <!-- Question: Sore Throat -->
+        <div class="form-group">
+          <label>Do you have a sore throat?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="throat-yes"
+              formControlName="throat"
+              value="yes"
+            />
+            <label class="form-check-label" for="throat-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="throat-no"
+              formControlName="throat"
+              value="no"
+            />
+            <label class="form-check-label" for="throat-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('throat')?.invalid && healthDeclarationForm.get('throat')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+
+        <!-- Question: Diarrhea -->
+        <div class="form-group">
+          <label>Do you have diarrhea?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="diarrhea-yes"
+              formControlName="diarrhea"
+              value="yes"
+            />
+            <label class="form-check-label" for="diarrhea-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="diarrhea-no"
+              formControlName="diarrhea"
+              value="no"
+            />
+            <label class="form-check-label" for="diarrhea-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('diarrhea')?.invalid && healthDeclarationForm.get('diarrhea')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+        <!-- Question: Influenza-like Symptoms -->
+        <div class="form-group">
+          <label>Do you have influenza-like symptoms? (headache, aches and pains, rash on skin)</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="influenza-yes"
+              formControlName="influenza"
+              value="yes"
+            />
+            <label class="form-check-label" for="influenza-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="influenza-no"
+              formControlName="influenza"
+              value="no"
+            />
+            <label class="form-check-label" for="influenza-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('influenza')?.invalid && healthDeclarationForm.get('influenza')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+        <!-- Question: History of COVID-19 -->
+        <div class="form-group">
+          <label>Do you have a history of COVID-19 infection?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="history-covid-yes"
+              formControlName="historyCovid"
+              value="yes"
+            />
+            <label class="form-check-label" for="history-covid-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="history-covid-no"
+              formControlName="historyCovid"
+              value="no"
+            />
+            <label class="form-check-label" for="history-covid-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('historyCovid')?.invalid && healthDeclarationForm.get('historyCovid')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+        <!-- Question: Family Member Tested Positive -->
+        <div class="form-group">
+          <label>Do you have a member of your family who tested positive for COVID-19?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="family-positive-yes"
+              formControlName="familyPositive"
+              value="yes"
+            />
+            <label class="form-check-label" for="family-positive-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="family-positive-no"
+              formControlName="familyPositive"
+              value="no"
+            />
+            <label class="form-check-label" for="family-positive-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('familyPositive')?.invalid && healthDeclarationForm.get('familyPositive')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+        <!-- Question: Contact with Positive Case -->
+        <div class="form-group">
+          <label>Have you been in contact with someone who has tested positive for COVID-19?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="contact-positive-yes"
+              formControlName="contactPositive"
+              value="yes"
+            />
+            <label class="form-check-label" for="contact-positive-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="contact-positive-no"
+              formControlName="contactPositive"
+              value="no"
+            />
+            <label class="form-check-label" for="contact-positive-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('contactPositive')?.invalid && healthDeclarationForm.get('contactPositive')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+        <!-- Question: Travelled to Local Transmission Area -->
+        <div class="form-group">
+          <label>Have you traveled or lived in an area with a report of local transmission of COVID-19?</label>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="local-transmission-yes"
+              formControlName="localTransmission"
+              value="yes"
+            />
+            <label class="form-check-label" for="local-transmission-yes">Yes</label>
+          </div>
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="radio"
+              id="local-transmission-no"
+              formControlName="localTransmission"
+              value="no"
+            />
+            <label class="form-check-label" for="local-transmission-no">No</label>
+          </div>
+          <div *ngIf="healthDeclarationForm.get('localTransmission')?.invalid && healthDeclarationForm.get('localTransmission')?.touched" class="text-danger">
+            Please answer this question.
+          </div>
+        </div>
+
+<!-- Question: Recent Travel Within the Philippines -->
+<div class="form-group">
+  <label>Have you traveled within the Philippines by air, bus, or train within the past 14 days?</label>
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      id="travel-ph-yes"
+      formControlName="travelPh"
+      value="yes"
+    />
+    <label class="form-check-label" for="travel-ph-yes">Yes</label>
+  </div>
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      id="travel-ph-no"
+      formControlName="travelPh"
+      value="no"
+    />
+    <label class="form-check-label" for="travel-ph-no">No</label>
+  </div>
+  <div *ngIf="healthDeclarationForm.get('travelPh')?.invalid && healthDeclarationForm.get('travelPh')?.touched" class="text-danger">
+    Please answer this question.
+  </div>
+</div>
+
+<!-- Question: Recent Travel Outside the Philippines -->
+<div class="form-group">
+  <label>Have you traveled outside the Philippines by air or cruise ship in the past 14 days?</label>
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      id="travel-outside-ph-yes"
+      formControlName="travelOutsidePh"
+      value="yes"
+    />
+    <label class="form-check-label" for="travel-outside-ph-yes">Yes</label>
+  </div>
+  <div class="form-check">
+    <input
+      class="form-check-input"
+      type="radio"
+      id="travel-outside-ph-no"
+      formControlName="travelOutsidePh"
+      value="no"
+    />
+    <label class="form-check-label" for="travel-outside-ph-no">No</label>
+  </div>
+  <div *ngIf="healthDeclarationForm.get('travelOutsidePh')?.invalid && healthDeclarationForm.get('travelOutsidePh')?.touched" class="text-danger">
+    Please answer this question.
+  </div>
+</div>
+
+
+        <!-- Submit Button -->
+        <div class="form-group">
+          <button type="submit" class="btn btn-primary" [disabled]="healthDeclarationForm.invalid">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+

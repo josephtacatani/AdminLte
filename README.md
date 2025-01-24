@@ -25,3 +25,14 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+
+mga i install nimo atay!!
+
+npm install datatables.net datatables.net-bs4 jquery
+
+//buttons
+npm install datatables.net-buttons datatables.net-buttons-bs4
+npm install --save-dev @types/datatables.net-buttons
+
+npm install -g json-server
+json-server --watch db.json

@@ -1,0 +1,365 @@
+<section class="content-header">
+  <div class="container-fluid">
+    <div class="row mb-2">
+      <div class="col-sm-6"></div>
+      <div class="col-sm-6">
+        <ol class="breadcrumb float-sm-right"></ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Appointment Card -->
+<div class="col-md-8">
+  <div class="card card-default">
+    <div class="card-header">
+      <h3 class="card-title">Set an Appointment</h3>
+    </div>
+    <div class="card-body">
+      <div class="callout callout-danger">
+        <h5>
+          Please be advised that this is not yet a confirmed appointment.
+          Our Clinic will email or call you to send your schedule.
+        </h5>
+      </div>
+      <p>
+        Please do not come to your appointment if you have signs or symptoms of COVID-19. Wearing a face mask is a must to ensure the safety of Doctors and Patients. We will confirm your appointment via email or call 2 to 3 days before your appointment date.
+        This questionnaire is designed with your safety in mind and must be answered honestly. Your answers will be reviewed prior to your appointment, and a member of our team will contact you if we recommend rescheduling to a later date. An answer of YES does not exclude you from treatment. Please answer YES or NO to each of the following questions. Thank you for your consideration and understanding.
+      </p>
+      <div class="row">
+
+        <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+          <div class="col-md-8">
+            <div class="card card-default">
+              <div class="card-header">
+                <h3 class="card-title">Set an Appointment</h3>
+              </div>
+              <div class="card-body">
+                <div class="callout callout-danger">
+                  <h5>Please be advised that this is not yet a confirmed appointment.</h5>
+                </div>
+        
+                <!-- Preferred Dentist (Single Select with Search) -->
+                <div class="form-group">
+                  <label for="dentist-select">Preferred Dentist</label>
+                  <ng-select [items]="dentists$ | async"
+                             bindLabel="fullname"
+                             bindValue="user_id"
+                             formControlName="dentist_id"
+                             placeholder="Select a Dentist"
+                             [searchable]="true">
+                  </ng-select>
+                  <div *ngIf="appointmentForm.get('dentist_id')?.invalid && appointmentForm.get('dentist_id')?.touched" class="text-danger">
+                    Dentist selection is required.
+                  </div>
+                </div>
+        
+                <!-- Appointment Date -->
+                <div class="form-group">
+                  <label for="appointment-date">Date:</label>
+                  <input type="date" id="appointment-date" class="form-control" formControlName="date" />
+                  <div *ngIf="appointmentForm.get('date')?.invalid && appointmentForm.get('date')?.touched" class="text-danger">
+                    Date is required.
+                  </div>
+                </div>
+        
+                <!-- Appointment Time -->
+                <div class="form-group">
+                  <label for="appointment-time">Time:</label>
+                  <input type="time" id="appointment-time" class="form-control" formControlName="time" />
+                  <div *ngIf="appointmentForm.get('time')?.invalid && appointmentForm.get('time')?.touched" class="text-danger">
+                    Time is required.
+                  </div>
+                </div>
+        
+                <!-- Services Selection (Multi-Select with Search) -->
+                <div class="form-group">
+                  <label for="services-select">Services:</label>
+                  <ng-select [items]="services"
+                             bindLabel="name"
+                             bindValue="id"
+                             formControlName="services"
+                             [multiple]="true"
+                             placeholder="Select services">
+                  </ng-select>
+                  <div *ngIf="appointmentForm.get('services')?.invalid && appointmentForm.get('services')?.touched" class="text-danger">
+                    At least one service must be selected.
+                  </div>
+                </div>
+        
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary" [disabled]="appointmentForm.invalid">Submit</button>
+              </div>
+            </div>
+          </div>
+        </form>
+        
+        
+        
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Health Declaration Card -->
+<div class="col-md-8">
+  <div class="card card-default">
+    <div class="card-header">
+      <h3 class="card-title">Health Declaration</h3>
+    </div>
+    <div class="card-body">
+      <!-- Health Declaration Questions -->
+      <div class="questionnaire">
+        <!-- Question 1 -->
+        <div class="question">
+          <div class="question-title">
+            <b>Do you have a fever or temperature over 38 °C?</b>
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="fever-yes" name="fever" value="yes" />
+              <label class="form-check-label" for="fever-yes">Yes</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="fever-no" name="fever" value="no"  />
+              <label class="form-check-label" for="fever-no">No</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="question">
+          <div class="question-title">
+            <b>Have you experienced shortness of breath or had trouble breathing?</b>
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="breath-yes" name="breathing" value="yes" />
+              <label class="form-check-label" for="breath-yes">Yes</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="breath-no" name="breathing" value="no"  />
+              <label class="form-check-label" for="breath-no">No</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question">
+          <div class="question-title">
+            <b>Do you have a dry cough?</b>
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="cough-yes" name="cough" value="yes" />
+              <label class="form-check-label" for="cough-yes">Yes</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="cough-no" name="cough" value="no"  />
+              <label class="form-check-label" for="cough-no">No</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question">
+          <div class="question-title">
+            <b>Do you have a runny nose?</b>
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="nose-yes" name="nose" value="yes" />
+              <label class="form-check-label" for="nose-yes">Yes</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="nose-no" name="nose" value="no"  />
+              <label class="form-check-label" for="nose-no">No</label>
+            </div>
+          </div>
+        </div>
+
+                <!-- Question 5 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Have you recently lost or had a reduction in your sense of smell?</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="smell-yes" name="smell" value="yes" />
+                      <label class="form-check-label" for="smell-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="smell-no" name="smell" value="no"  />
+                      <label class="form-check-label" for="smell-no">No</label>
+                    </div>
+                  </div>
+                </div>
+        
+                <!-- Question 6 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Do you have a sore throat?</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="throat-yes" name="throat" value="yes" />
+                      <label class="form-check-label" for="throat-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="throat-no" name="throat" value="no"  />
+                      <label class="form-check-label" for="throat-no">No</label>
+                    </div>
+                  </div>
+                </div>
+        
+                <!-- Question 7 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Do you have diarrhea?</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="diarrhea-yes" name="diarrhea" value="yes" />
+                      <label class="form-check-label" for="diarrhea-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="diarrhea-no" name="diarrhea" value="no"  />
+                      <label class="form-check-label" for="diarrhea-no">No</label>
+                    </div>
+                  </div>
+                </div>
+        
+                <!-- Question 8 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Do you have influenza-like symptoms? (headache, aches and pains, a rash on skin)</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="influenza-yes" name="influenza" value="yes" />
+                      <label class="form-check-label" for="influenza-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="influenza-no" name="influenza" value="no"  />
+                      <label class="form-check-label" for="influenza-no">No</label>
+                    </div>
+                  </div>
+                </div>
+        
+                <!-- Question 9 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Do you have a history of COVID-19 infection?</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="history-covid-yes" name="history-covid" value="yes" />
+                      <label class="form-check-label" for="history-covid-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="history-covid-no" name="history-covid" value="no"  />
+                      <label class="form-check-label" for="history-covid-no">No</label>
+                    </div>
+                  </div>
+                </div>
+        
+                <!-- Question 10 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Do you have a member of your family who tested positive for COVID-19?</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="family-positive-yes" name="family-positive" value="yes" />
+                      <label class="form-check-label" for="family-positive-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="family-positive-no" name="family-positive" value="no"  />
+                      <label class="form-check-label" for="family-positive-no">No</label>
+                    </div>
+                  </div>
+                </div>
+        
+                <!-- Question 11 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Have you been in contact with someone who has tested positive for COVID-19?</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="contact-positive-yes" name="contact-positive" value="yes" />
+                      <label class="form-check-label" for="contact-positive-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="contact-positive-no" name="contact-positive" value="no"  />
+                      <label class="form-check-label" for="contact-positive-no">No</label>
+                    </div>
+                  </div>
+                </div>
+        
+                <!-- Question 12 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Have you traveled or lived in an area with a report of local transmission of COVID-19?</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="local-transmission-yes" name="local-transmission" value="yes" />
+                      <label class="form-check-label" for="local-transmission-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="local-transmission-no" name="local-transmission" value="no"  />
+                      <label class="form-check-label" for="local-transmission-no">No</label>
+                    </div>
+                  </div>
+                </div>
+        
+                <!-- Question 13 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Have you traveled within the Philippines by air, bus, or train within the past 14 days?</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="travel-ph-yes" name="travel-ph" value="yes" />
+                      <label class="form-check-label" for="travel-ph-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="travel-ph-no" name="travel-ph" value="no"  />
+                      <label class="form-check-label" for="travel-ph-no">No</label>
+                    </div>
+                  </div>
+                </div>
+        
+                <!-- Question 14 -->
+                <div class="question">
+                  <div class="question-title">
+                    <b>Have you traveled outside the Philippines by air or cruise ship in the past 14 days?</b>
+                  </div>
+                  <div class="form-group">
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="travel-outside-ph-yes" name="travel-outside-ph" value="yes" />
+                      <label class="form-check-label" for="travel-outside-ph-yes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                      <input class="form-check-input" type="radio" id="travel-outside-ph-no" name="travel-outside-ph" value="no"  />
+                      <label class="form-check-label" for="travel-outside-ph-no">No</label>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <!-- Submit Button -->
+              <div class="col-md-8">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            
+              </div>
+      </div>
+    </div>
+
+</div>
+
+  
+
+        
