@@ -86,8 +86,8 @@
               <div class="form-group">
                 <label for="services-select">Services:</label>
                 <ng-select
-                  [items]="services"
-                  bindLabel="name"
+                  [items]="services$ | async"
+                  bindLabel="service_name"
                   bindValue="id"
                   formControlName="services"
                   [multiple]="true"

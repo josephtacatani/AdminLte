@@ -21,6 +21,9 @@ import { AppointmentActions } from 'src/app/ngrx/appointment/addappointment.acti
 import { selectSelectedPatient } from 'src/app/ngrx/patients/patients.reducers';
 import { AlertComponent } from '../../alert/alert.component';
 import { selectError, selectMessage } from 'src/app/ngrx/appointment/addappointment.reducers';
+import { Service } from 'src/app/interfaces/servicelist.interface';
+import { selectServices } from 'src/app/ngrx/servicelist/servicelist.reducers';
+import { ServicesActions } from 'src/app/ngrx/servicelist/servicelsit.actions';
 
 @Component({
   selector: 'app-add-appointment-modal',
@@ -42,16 +45,8 @@ export class AddAppointmentModalComponent {
   timeSlots$!: Observable<TimeSlot[]>;
   message$!: Observable<string | null>;
   error$!: Observable<string | null>;
+  services$!: Observable<Service[]>; // ✅ Observable for services
 
-  services = [
-    { id: 1, name: 'Exodontia' },
-    { id: 2, name: 'Prosthodontics Treatment' },
-    { id: 3, name: 'Oral Prophylaxis' },
-    { id: 4, name: 'Orthodontic Treatment' },
-    { id: 5, name: 'Oral Surgery' },
-    { id: 6, name: 'Cosmetic Dentistry' },
-    { id: 7, name: 'Restorative Treatment' },
-  ];
 
   constructor(private fb: FormBuilder, private store: Store) {}
 
@@ -60,7 +55,8 @@ export class AddAppointmentModalComponent {
     this.loadDentists();
     this.setupDentistSelection();
     this.setupScheduleSelection();
-
+    this.loadServices(); // ✅ Load services from the store
+    this.appointmentForm.reset(); // ✅ Resets the form fields when closing
     this.message$ = this.store.pipe(select(selectMessage));
     this.error$ = this.store.pipe(select(selectError));
   }
@@ -88,6 +84,12 @@ export class AddAppointmentModalComponent {
     this.dentists$ = this.store.pipe(select(selectDentists));
     this.store.dispatch(DentistActions.loadDentists());
   }
+
+    /** ✅ Load Services */
+    private loadServices(): void {
+      this.services$ = this.store.pipe(select(selectServices));
+      this.store.dispatch(ServicesActions.loadServices()); // ✅ Fetch services on init
+    }
 
   /** ✅ Detect Dentist Selection & Fetch Available Dates */
   private setupDentistSelection(): void {

@@ -14,6 +14,7 @@ import { decodeAccessToken } from 'src/app/services/auth/auth.utils';
 export class AppointmentEffects {
   constructor(private actions$: Actions, private appointmentService: AppointmentService) {}
 
+  
   // ✅ Load all appointments
   loadAppointments$ = createEffect(() =>
     this.actions$.pipe(
@@ -26,6 +27,9 @@ export class AppointmentEffects {
       )
     )
   );
+
+
+  
 
   // ✅ Load appointment by ID
   loadAppointmentById$ = createEffect(() =>
@@ -99,6 +103,19 @@ export class AppointmentEffects {
       )
     )
   );
+
+  createAppointmentSuccess$ = createEffect(() =>
+  this.actions$.pipe(
+    ofType(AppointmentActions.createAppointmentSuccess),
+    map(({ response }) => {
+      const userData = decodeAccessToken();
+      if (userData?.id) {
+        return AppointmentActions.loadAllAppointmentsByPatientId({ patient_id: userData.id });
+      }
+      return { type: 'NO_ACTION' };
+    })
+  )
+);
   
 
   // ✅ Update appointment
@@ -143,7 +160,12 @@ export class AppointmentEffects {
       // ❌ Auto-clear error message after 3 seconds
       clearError$ = createEffect(() =>
         this.actions$.pipe(
-          ofType(AppointmentActions.createAppointmentFailure),
+          ofType(
+            AppointmentActions.createAppointmentFailure,
+            AppointmentActions.updateAppointmentFailure,
+            AppointmentActions.cancelAppointmentFailure
+          
+          ),
           delay(3000), // ⏳ Wait for 3 seconds
           map(() => AppointmentActions.clearError())
         )
@@ -157,7 +179,8 @@ export class AppointmentEffects {
             return [
               ScheduleActions.loadScheduleById({ schedule_id: appointment.schedule_id }), // Fetch schedule
               DentistActions.loadDentist({ id: appointment.dentist_id }), // Fetch dentist
-              ScheduleActions.loadAllTimeSlotsById({ scheduleId: appointment.schedule_id }) // Fetch timeslots
+              ScheduleActions.loadTimeSlotByTimeslotId({ timeslot_id: appointment.timeslot_id }) // Fetch timeslots
+
             ];
           })
         )
@@ -189,11 +212,29 @@ export class AppointmentEffects {
           map(({ response }) => {
             const userData = decodeAccessToken(); // Get user ID
             if (userData?.id) {
-              return AppointmentActions.loadAppointmentByPatientId({ id: userData.id });
+              return AppointmentActions.loadAllAppointmentsByPatientId({ patient_id: userData.id });
             }
             return { type: 'NO_ACTION' }; // Avoid errors if no user is found
           })
         )
       );
+
+
+        // ✅ Effect: Load All Appointments By Patient ID
+  loadAllAppointmentsByPatientId$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AppointmentActions.loadAllAppointmentsByPatientId),
+      mergeMap(({ patient_id }) =>
+        this.appointmentService.getAllAppointmentsByPatientId(patient_id).pipe(
+          map((response) =>
+            AppointmentActions.loadAllAppointmentsByPatientIdSuccess({ detailedAppointments: response.data || [] })
+          ),
+          catchError((error) =>
+            of(AppointmentActions.loadAllAppointmentsByPatientIdFailure({ error: error.message }))
+          )
+        )
+      )
+    )
+  );
       
 }

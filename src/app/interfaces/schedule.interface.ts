@@ -30,3 +30,8 @@ export interface Schedule {
     message: string;
     data: TimeSlot[];
   }
+
+  export interface TimeslotIdResponse{
+    message: string;
+    data: TimeSlot;
+  }

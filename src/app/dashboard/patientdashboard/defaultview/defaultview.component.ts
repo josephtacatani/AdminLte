@@ -10,12 +10,12 @@ import { selectError, selectPatients, selectSelectedPatient } from 'src/app/ngrx
 import { decodeAccessToken } from 'src/app/services/auth/auth.utils';
 import { PatientsActions } from 'src/app/ngrx/patients/patients.actions';
 import { AddAppointmentModalComponent } from 'src/app/my-components/modals/add-appointment-modal/add-appointment-modal.component';
-import { Appointment } from 'src/app/interfaces/addappointment.interface';
-import { selectSelectedAppointment, selectSelectedAppointmentPatient } from 'src/app/ngrx/appointment/addappointment.reducers';
+import { Appointment, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
+import { selectAppointments, selectDetailedAppointments, selectSelectedAppointment, selectSelectedAppointmentPatient } from 'src/app/ngrx/appointment/addappointment.reducers';
 import { AppointmentActions } from 'src/app/ngrx/appointment/addappointment.actions';
 import { Dentist } from 'src/app/interfaces/dentist.interface';
 import { Schedule, TimeSlot } from 'src/app/interfaces/schedule.interface';
-import { selectSchedules, selectSelectedSchedule, selectTimeSlots, selectTimeSlotsById } from 'src/app/ngrx/schedules/schedules.reducers';
+import { selectSchedules, selectSelectedSchedule, selectSelectedTimeSlot, selectTimeSlots, selectTimeSlotsById } from 'src/app/ngrx/schedules/schedules.reducers';
 import { selectDentists, selectSelectedDentist } from 'src/app/ngrx/dentist/dentist.reducers';
 import { ConfirmModalComponent } from 'src/app/my-components/modals/confirm-modal/confirm-modal.component';
 declare var $: any;
@@ -37,8 +37,10 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
   appointments$!: Observable<Appointment | null>;
   schedule$: Observable<Schedule | null> = this.store.pipe(select(selectSelectedSchedule));
   dentist$: Observable<Dentist | null> = this.store.pipe(select(selectSelectedDentist));
-  timeslots$: Observable<TimeSlot[]> = this.store.pipe(select(selectTimeSlotsById));
-
+  appointment$ = this.store.pipe(select(selectSelectedAppointment));
+  timeslot$ = this.store.pipe(select(selectSelectedTimeSlot));
+  appointmentsAll$: Observable<Appointment[] | null> = this.store.pipe(select(selectAppointments));
+  detailedAppointments$: Observable<DetailedAppointment[] | null> = this.store.pipe(select(selectDetailedAppointments));
 
   constructor(private store: Store, private router: Router) {
     this.patient$ = this.store.pipe(select(selectSelectedPatient));
@@ -49,11 +51,6 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
     
   }
 
-    // ✅ Extracting specific fields
-    startTime$: Observable<string> = this.schedule$.pipe(
-      map(schedule => schedule?.start_time || 'N/A')
-    );
-
     date$: Observable<string> = this.schedule$.pipe(
       map(schedule => schedule?.date || 'N/A')
     );
@@ -62,32 +59,27 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
       map(dentist => dentist?.fullname || 'N/A')
     );
 
+
+    timeslotStartTime$: Observable<string> = this.timeslot$.pipe(
+      map(timeslot => timeslot?.start_time || 'N/A')
+    );
+    
+    timeslotEndTime$: Observable<string> = this.timeslot$.pipe(
+      map(timeslot => timeslot?.end_time || 'N/A')
+    );
+
+    latestAppointment$: Observable<DetailedAppointment | null> = this.detailedAppointments$.pipe(
+      map(appointments =>
+        appointments && appointments.length > 0
+          ? [...appointments].sort((a, b) => b.appointment_id - a.appointment_id)[0] // Sort by appointmentId in descending order
+          : null
+      )
+    );
+    
+    
+    
     
 
-
-  // tableData = [
-  //   { date: '2023-10-01', time: '10:00 AM', doctor: 'Dr. John Smith', status: 'Confirmed' },
-  //   { date: '2023-10-02', time: '11:00 AM', doctor: 'Dr. Jane Doe', status: 'Pending' },
-  //   { date: '2023-10-03', time: '12:00 PM', doctor: 'Dr. Emily Johnson', status: 'Cancelled' },
-  //   { date: '2023-10-04', time: '01:00 PM', doctor: 'Dr. Michael Brown', status: 'Confirmed' },
-  //   { date: '2023-10-05', time: '02:00 PM', doctor: 'Dr. Sarah Davis', status: 'Pending' }
-  // ];
-
-  // prescriptionData = [
-  //   { doctorName: 'Dr. John Smith', date: '2023-10-01', medicine: 'Medicine A', notes: 'Take twice daily' },
-  //   { doctorName: 'Dr. Jane Doe', date: '2023-10-02', medicine: 'Medicine B', notes: 'Take once daily' },
-  //   { doctorName: 'Dr. Emily Johnson', date: '2023-10-03', medicine: 'Medicine C', notes: 'Take after meals' },
-  //   { doctorName: 'Dr. Michael Brown', date: '2023-10-04', medicine: 'Medicine D', notes: 'Take before bed' },
-  //   { doctorName: 'Dr. Sarah Davis', date: '2023-10-05', medicine: 'Medicine E', notes: 'Take with water' }
-  // ];
-
-  // treatmentData = [
-  //   { dateVisit: '2023-10-01', teethNos: '12, 13', treatment: 'Filling', description: 'Cavity filling', fees: '$100', remarks: 'N/A' },
-  //   { dateVisit: '2023-10-02', teethNos: '14', treatment: 'Extraction', description: 'Tooth extraction', fees: '$150', remarks: 'N/A' },
-  //   { dateVisit: '2023-10-03', teethNos: '15, 16', treatment: 'Cleaning', description: 'Teeth cleaning', fees: '$80', remarks: 'N/A' },
-  //   { dateVisit: '2023-10-04', teethNos: '17', treatment: 'Root Canal', description: 'Root canal treatment', fees: '$200', remarks: 'N/A' },
-  //   { dateVisit: '2023-10-05', teethNos: '18', treatment: 'Whitening', description: 'Teeth whitening', fees: '$120', remarks: 'N/A' }
-  // ];
 
 
 
@@ -155,7 +147,7 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
     const userData = decodeAccessToken();
     if (userData?.id) {
       this.store.dispatch(PatientsActions.loadPatient({ id: userData.id })); // ✅ Fetch patient using ID from JWT
-      
+      this.store.dispatch(AppointmentActions.loadAllAppointmentsByPatientId({patient_id: userData.id}))
       this.store.dispatch(AppointmentActions.loadAppointmentByPatientId({id: userData.id }));
     } else {
       console.warn('No user ID found in token!');
@@ -184,6 +176,8 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
 
   }
 
+
+
   openConfirmModal(): void {
     this.isCancelModalVisible = true;
   }
@@ -203,5 +197,9 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
       this.isCancelModalVisible = false; // ✅ Close modal after action
       this.selectedAppointmentId = null; // ✅ Reset selection
     }
+  }
+
+  getServiceNames(appointment: DetailedAppointment): string {
+    return appointment.services.map(service => service.service_name).join(', ');
   }
 }

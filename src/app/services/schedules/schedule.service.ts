@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment.prod';
 import { Patient, PatientResponse, PatientsListResponse } from 'src/app/interfaces/patient_details.interface';
-import { Schedule, ScheduleResponse, SchedulesResponse, TimeSlotsResponse } from 'src/app/interfaces/schedule.interface';
+import { Schedule, ScheduleResponse, SchedulesResponse, TimeslotIdResponse, TimeSlotsResponse } from 'src/app/interfaces/schedule.interface';
 
 
 @Injectable({
@@ -13,6 +13,7 @@ export class SchedulesService {
   private apiUrl = `${environment.apiUrl}/schedules`; // ✅ Ensure correct endpoint
   private timeSlotsUrl = `${environment.apiUrl}/timeslots/available`; // ✅ Ensure correct endpoint
   private timeAllSlotsUrl = `${environment.apiUrl}/timeslots/all`; // ✅ Ensure correct endpoint
+  private timeSlotById = `${environment.apiUrl}/timeslots`; // ✅ Ensure correct endpoint
 
 
   constructor(private http: HttpClient) {}
@@ -47,5 +48,9 @@ export class SchedulesService {
 
   getAllTimeSlotsById(scheduleId: number): Observable<TimeSlotsResponse> {
     return this.http.get<TimeSlotsResponse>(`${this.timeAllSlotsUrl}/${scheduleId}`);
+  }
+
+  getTimeslotById(timeslotId: number): Observable<TimeslotIdResponse> {
+    return this.http.get<TimeslotIdResponse>(`${this.timeSlotById}/${timeslotId}`);
   }
 }

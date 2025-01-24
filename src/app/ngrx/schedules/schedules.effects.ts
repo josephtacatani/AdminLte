@@ -137,6 +137,25 @@ export class ScheduleEffects {
       )
     )
   );
+
+    // ✅ Load timeslot by ID
+    loadTimeslotById$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(ScheduleActions.loadTimeSlotByTimeslotId),
+        mergeMap(({ timeslot_id }) =>
+          this.scheduleService.getTimeslotById(timeslot_id).pipe(
+            map((timeSlotsResponse) =>
+              ScheduleActions.loadTimeByTimeslotIdSuccess({ timeSlotsResponse })
+            ),
+            catchError((error) =>
+              of(ScheduleActions.loadTimeByTimeslotIdFailure({ error: error.message }))
+            )
+          )
+        )
+      )
+    );
+
+    
   
   
 }

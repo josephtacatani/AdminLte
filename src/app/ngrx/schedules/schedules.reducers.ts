@@ -6,6 +6,7 @@ export interface ScheduleState {
   isLoading: boolean;
   schedules: Schedule[];
   selectedSchedule: Schedule | null;
+  selectedTimeSlot: TimeSlot | null;
   error: string | null;
   deleteMessage: string | null;
   timeSlots: TimeSlot[];
@@ -17,11 +18,13 @@ export const initialScheduleState: ScheduleState = {
   isLoading: false,
   schedules: [],
   selectedSchedule: null,
+  selectedTimeSlot: null,
   error: null,
   deleteMessage: null,
   timeSlots: [],
   allTimeSlots: [],// ✅ Added for all timeslots
   timeSlotsById: []
+
 };
 
 export const scheduleFeature = createFeature({
@@ -175,6 +178,26 @@ on(ScheduleActions.loadAllTimeSlotsByIdFailure, (state, { error }) => ({
   error,
 })),
 
+// ✅ Load timeslot by ID
+on(ScheduleActions.loadTimeSlotByTimeslotId, (state) => ({
+  ...state,
+  isLoading: true,
+  error: null,
+})),
+
+on(ScheduleActions.loadTimeByTimeslotIdSuccess, (state, { timeSlotsResponse }) => ({
+  ...state,
+  isLoading: false,
+  selectedTimeSlot: timeSlotsResponse.data, // ✅ Store the retrieved timeslot
+  error: null,
+})),
+
+on(ScheduleActions.loadTimeByTimeslotIdFailure, (state, { error }) => ({
+  ...state,
+  isLoading: false,
+  error,
+})),
+
     
 
   ),
@@ -190,5 +213,6 @@ export const {
   selectDeleteMessage,
   selectTimeSlots,
   selectAllTimeSlots,
-  selectTimeSlotsById
+  selectTimeSlotsById,
+  selectSelectedTimeSlot
 } = scheduleFeature;

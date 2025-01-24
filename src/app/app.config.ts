@@ -20,6 +20,8 @@ import { scheduleFeatureKey, scheduleReducer } from './ngrx/schedules/schedules.
 import { ScheduleEffects } from './ngrx/schedules/schedules.effects';
 import { appointmentFeatureKey, appointmentReducer } from './ngrx/appointment/addappointment.reducers';
 import { AppointmentEffects } from './ngrx/appointment/addappointment.effects';
+import { servicesFeatureKey, servicesReducer } from './ngrx/servicelist/servicelist.reducers';
+import { ServicesEffects } from './ngrx/servicelist/servicelist.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -32,7 +34,8 @@ export const appConfig: ApplicationConfig = {
       [patientsFeatureKey]: patientsReducer,
       [dentistFeatureKey]: dentistReducer,
       [scheduleFeatureKey]: scheduleReducer,
-      [appointmentFeatureKey]: appointmentReducer
+      [appointmentFeatureKey]: appointmentReducer,
+      [servicesFeatureKey]: servicesReducer
     }),
     provideEffects([
       AuthEffects, 
@@ -40,7 +43,8 @@ export const appConfig: ApplicationConfig = {
       PatientsEffects, 
       DentistEffects,
       ScheduleEffects,
-      AppointmentEffects
+      AppointmentEffects,
+      ServicesEffects
     ]),  // <-- Ensure AuthEffects is provided
     provideStoreDevtools({
       maxAge: 25,

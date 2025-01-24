@@ -1,10 +1,11 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { ApiResponse, Appointment } from 'src/app/interfaces/addappointment.interface';
+import { ApiResponse, Appointment, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
 
 
 export const AppointmentActions = createActionGroup({
   source: 'Appointments',
   events: {
+    
     // ✅ Load all appointments
     'Load Appointments': emptyProps(),
     'Load Appointments Success': props<{ appointments: Appointment[] }>(),
@@ -19,6 +20,7 @@ export const AppointmentActions = createActionGroup({
     'Load Appointment By Patient Id': props<{ id: number }>(),
     'Load Appointment By Patient Id Success': props<{ appointment: Appointment }>(),
     'Load Appointment By Patient Id Failure': props<{ error: string }>(),
+
 
     // ✅ Create appointment
     'Create Appointment': props<{ appointment: Partial<Appointment>; service_list_id: number[] }>(),
@@ -44,6 +46,10 @@ export const AppointmentActions = createActionGroup({
     'Cancel Appointment Success': props<{ response: ApiResponse<{ appointmentId: number }> }>(),
     'Cancel Appointment Failure': props<{ response: ApiResponse<null> }>(),
 
+        // ✅ Load all detailed appointments for a patient
+        'Load All Appointments By Patient Id': props<{ patient_id: number }>(),
+        'Load All Appointments By Patient Id Success': props<{ detailedAppointments: DetailedAppointment[] }>(),
+        'Load All Appointments By Patient Id Failure': props<{ error: string }>(),
     
   },
 });

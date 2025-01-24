@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { Schedule, ScheduleResponse, SchedulesResponse, TimeSlotsResponse } from 'src/app/interfaces/schedule.interface';
+import { Schedule, ScheduleResponse, SchedulesResponse, TimeslotIdResponse, TimeSlotsResponse } from 'src/app/interfaces/schedule.interface';
 
 
 export const ScheduleActions = createActionGroup({
@@ -37,5 +37,9 @@ export const ScheduleActions = createActionGroup({
     'Load All Time Slots': emptyProps(),
     'Load All Time Slots Success': props<{ timeSlotsResponse: TimeSlotsResponse }>(),
     'Load All Time Slots Failure': props<{ error: string }>(),
+
+    'Load Time Slot by Timeslot Id': props<{ timeslot_id: number }>(),
+    'Load Time by Timeslot Id Success': props<{ timeSlotsResponse: TimeslotIdResponse }>(),
+    'Load Time by Timeslot Id Failure': props<{ error: string }>(),
   }
 });

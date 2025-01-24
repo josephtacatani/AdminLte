@@ -1,5 +1,5 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
-import { Appointment } from 'src/app/interfaces/addappointment.interface';
+import { Appointment, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
 import { AppointmentActions } from './addappointment.actions';
 
 
@@ -9,6 +9,8 @@ export interface AppointmentState {
   appointments: Appointment[];
   selectedAppointment: Appointment | null;
   selectedAppointmentPatient: Appointment | null;
+  allAppointments: Appointment[]; // ✅ Stores multiple appointments
+  detailedAppointments: DetailedAppointment[];
   error: string | null;
   message: string | null;
 }
@@ -18,6 +20,8 @@ export const initialAppointmentState: AppointmentState = {
   appointments: [],
   selectedAppointment: null,
   selectedAppointmentPatient:  null,
+  allAppointments: [], // ✅ Holds multiple appointments
+  detailedAppointments: [],
   error: null,
   message: null
 };
@@ -195,7 +199,26 @@ on(AppointmentActions.cancelAppointmentFailure, (state, { response }) => ({
           on(AppointmentActions.clearError, (state) => ({
             ...state,
             error: null,
-          }))
+          })),
+
+              // ✅ Load All Appointments By Patient ID
+    on(AppointmentActions.loadAllAppointmentsByPatientId, (state) => ({
+      ...state,
+      isLoading: true,
+      error: null,
+    })),
+    on(AppointmentActions.loadAllAppointmentsByPatientIdSuccess, (state, { detailedAppointments }) => ({
+      ...state,
+      isLoading: false,
+      detailedAppointments,
+      error: null,
+    })),
+    on(AppointmentActions.loadAllAppointmentsByPatientIdFailure, (state, { error }) => ({
+      ...state,
+      isLoading: false,
+      error,
+    }))
+
   ),
 });
 
@@ -208,5 +231,7 @@ export const {
   selectSelectedAppointment,
   selectError,
   selectMessage,
-  selectSelectedAppointmentPatient
+  selectSelectedAppointmentPatient,
+  selectAllAppointments,
+  selectDetailedAppointments
 } = appointmentFeature;

@@ -24,3 +24,21 @@ export interface ApiResponse<T> {
     service_list_id: number;
   }
   
+
+  export interface DetailedAppointment {
+    appointment_id: number;
+    status: string;
+    appointment_type: string;
+    schedule_date: string;
+    timeslot_start_time: string;
+    timeslot_end_time: string;
+    dentist_name: string;
+    patient_name: string;
+    services: AppointmentService[];
+  }
+  
+  export interface AppointmentService {
+    service_id: number;
+    service_name: string;
+  }
+  

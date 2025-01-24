@@ -84,7 +84,7 @@
                   <i class="fa fa-plus-circle"></i> Request an Appointment
                 </button>
 
-                <div class="post" *ngIf="appointments$ | async as appointment; else noAppointment">
+                <div class="post" *ngIf="latestAppointment$ | async as appointment; else noAppointment">
                   <div class="col-md-4 text-left">
 
                   </div>
@@ -94,7 +94,7 @@
                       <b>Date:</b>
                     </div>
                     <div class="col-md-6">
-                      <span>{{date$ | async}}</span>
+                      <span>{{appointment.schedule_date | date: 'MMMM d, y' }}</span>
                     </div>
                   </div>
                   <div class="row">
@@ -102,7 +102,7 @@
                       <b>Time:</b>
                     </div>
                     <div class="col-md-6">
-                      <span>{{ startTime$ | async }}</span>
+                      <span>{{ appointment.timeslot_start_time }} - {{ appointment.timeslot_end_time}}</span>
                     </div>
                   </div>
                   <div class="row">
@@ -110,7 +110,7 @@
                       <b>Dentist:</b>
                     </div>
                     <div class="col-md-6">
-                      <span>{{ dentistName$ | async }}</span>
+                      <span>{{ appointment.dentist_name }}</span>
                     </div>
                   </div>
                   <div class="row">
@@ -118,9 +118,17 @@
                       <b>Status:</b>
                     </div>
                     <div class="col-md-6">
-                      <span class="badge badge-warning">{{appointment.status}}</span>
+                      <span [ngClass]="{
+                          'badge-danger': appointment.status === 'canceled',
+                          'badge-warning': appointment.status === 'pending',
+                          'badge-success': appointment.status === 'confirmed'
+                        }" 
+                        class="badge">
+                        {{ appointment.status | titlecase }}
+                      </span>
                     </div>
                   </div>
+                  
                   <div class="row">
                     <div class="col-md-6">
                     </div>
@@ -129,7 +137,7 @@
                       *ngIf="appointment.status !== 'canceled'"
                       type="button"
                       class="btn btn-danger btn-block"
-                      (click)="openCancelModal(appointment.id ?? null)"
+                      (click)="openCancelModal(appointment.appointment_id)"
                     >
                       <i class="fa fa-times-circle"></i> Cancel Appointment
                     </button>
@@ -150,10 +158,28 @@
                       <th>Time</th>
                       <th>Doctor</th>
                       <th>Status</th>
+                      <th>Services</th> <!-- ✅ New Column -->
                     </tr>
                   </thead>
                   <tbody>
-                    <!-- Data will be populated by DataTables -->
+                    <tr *ngFor="let appointment of detailedAppointments$ | async">
+                      <td>{{ appointment.schedule_date | date:'yyyy-MM-dd' }}</td>
+                      <td>{{ appointment.timeslot_start_time }} - {{ appointment.timeslot_end_time }}</td>
+                      <td>{{ appointment.dentist_name }}</td>
+                      <td>
+                        <span class="badge"
+                          [ngClass]="{
+                            'badge-success': appointment.status === 'confirmed',
+                            'badge-warning': appointment.status === 'pending',
+                            'badge-danger': appointment.status === 'canceled'
+                          }">
+                          {{ appointment.status }}
+                        </span>
+                      </td>
+                      <td>
+                        {{ getServiceNames(appointment) }}
+                      </td>
+                    </tr>
                   </tbody>
                 </table>
               </div>

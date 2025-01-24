@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse, Appointment } from 'src/app/interfaces/addappointment.interface';
+import { ApiResponse, Appointment, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
 import { environment } from 'src/environments/environment.prod';
 
 
@@ -28,6 +28,13 @@ export class AppointmentService {
   // ✅ Get appointment by ID
   getAppointmentByPatientId(id: number): Observable<ApiResponse<Appointment>> {
     return this.http.get<ApiResponse<Appointment>>(`${this.apiUrl_patient}/${id}`);
+  }
+
+  // ✅ Get all detailed appointments by Patient ID (Including Services)
+  getAllAppointmentsByPatientId(patientId: number): Observable<ApiResponse<DetailedAppointment[]>> {
+    return this.http.get<ApiResponse<DetailedAppointment[]>>(
+      `${this.apiUrl}/getAllAppointmentsWithServicesByPatientId/${patientId}`
+    );
   }
 
   // ✅ Create a new appointment (Handles Optional `service_list_id`)
@@ -57,5 +64,12 @@ export class AppointmentService {
         status: 'canceled',
       });
     }
+
+    
+
+    
+
+
+    
 
 }
