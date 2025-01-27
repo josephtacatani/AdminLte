@@ -1,15 +1,29 @@
 <section>
-    <app-display-table
-    [data]="filteredPrescriptionData"
-    [columns]="columns"
-    [itemsPerPage]="itemsPerPage"
-    [(currentPage)]="currentPage"
-    [(searchTerm)]="searchTerm"
-    [pageSizeOptions]="[5, 10, 15, 20]"
-    [showAddButton]="false"
-    (searchTermChange)="filterprescriptionData($event)"
-    (currentPageChange)="currentPage = $event"
-    (sort)="sortprescriptionData($event)"
-  ></app-display-table>
-  </section>
-  
+  <ng-container *ngIf="filteredPrescriptionData$ | async as prescriptions; else loading">
+    <ng-container *ngIf="prescriptions.length > 0; else noData">
+      <app-display-table
+        [title]="pagetitle + ' List'"
+        [data]="prescriptions || []"
+        [columns]="columns"
+        [itemsPerPage]="itemsPerPage"
+        [(currentPage)]="currentPage"
+        [searchTerm]="searchTerm"
+        [pageSizeOptions]="[5, 10, 15, 20]"
+        [showAddButton]="false"
+        (searchTermChange)="filterPrescriptionData($event)"
+        (currentPageChange)="currentPage = $event"
+        (sort)="sortPrescriptionData($event)"
+      ></app-display-table>
+    </ng-container>
+
+    <!-- ✅ Show if no prescriptions -->
+    <ng-template #noData>
+      <p class="no-data-message">No prescription data available.</p>
+    </ng-template>
+  </ng-container>
+
+  <!-- ✅ Loading State -->
+  <ng-template #loading>
+    <p>Loading prescription details...</p>
+  </ng-template>
+</section>

@@ -24,28 +24,27 @@
 
         <ng-template #tableContent>
           <app-table
-          [title]="pagetitle + ' List'"
-          [data]="(filteredPatients$ | async) || []"
-          [columns]="columns"
-          [itemsPerPage]="itemsPerPage"
-          [(currentPage)]="currentPage"
-          [searchTerm]="searchTerm"
-          [pageSizeOptions]="[5, 10, 15, 20]"
-          [showAddButton]="false"
-          (searchTermChange)="filterPatients($event)"
-          (currentPageChange)="currentPage = $event"
-          (rowAction)="handleRowAction($event)"
-          (sort)="sortPatients($event)"
-          (actionClick)="handleActionClick($event)"
-        >
-          <!-- ✅ Custom Action Button for Viewing Patient -->
-          <ng-template #actionsTemplate let-patient="row">
-            <button class="btn btn-primary" (click)="handleRowAction(patient)">
-              View Details
-            </button>
-          </ng-template>
-        </app-table>
-        
+            [title]="pagetitle + ' List'"
+            [data]="(filteredPatients$ | async) || []"
+            [columns]="columns"
+            [itemsPerPage]="itemsPerPage"
+            [(currentPage)]="currentPage"
+            [searchTerm]="searchTerm"
+            [pageSizeOptions]="[5, 10, 15, 20]"
+            [showAddButton]="false"
+            (searchTermChange)="filterPatientsBySearch($event)"
+            (currentPageChange)="currentPage = $event"
+            (rowAction)="handleRowAction($event)"
+            (sort)="sortPatientsByColumn($event)"
+            (actionClick)="handleActionClick($event)"
+          >
+            <!-- ✅ Custom Action Button for Viewing Patient -->
+            <ng-template #actionsTemplate let-patient="row">
+              <button class="btn btn-primary" (click)="handleRowAction(patient)">
+                View Details
+              </button>
+            </ng-template>
+          </app-table>
         </ng-template>
       </div>
     </div>

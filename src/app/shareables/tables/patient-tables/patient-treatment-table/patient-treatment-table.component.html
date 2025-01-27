@@ -1,15 +1,29 @@
 <section>
-    <app-display-table
-    [data]="filteredtreatmentData"
-    [columns]="columns"
-    [itemsPerPage]="itemsPerPage"
-    [(currentPage)]="currentPage"
-    [(searchTerm)]="searchTerm"
-    [pageSizeOptions]="[5, 10, 15, 20]"
-    [showAddButton]="false"
-    (searchTermChange)="filtertreatmentData($event)"
-    (currentPageChange)="currentPage = $event"
-    (sort)="sorttreatmentData($event)"
-  ></app-display-table>
-  </section>
-  
+  <ng-container *ngIf="filteredTreatmentData$ | async as treatments; else loading">
+    <ng-container *ngIf="treatments.length > 0; else noData">
+      <app-display-table
+        [title]="pagetitle + ' List'"
+        [data]="treatments || []"
+        [columns]="columns"
+        [itemsPerPage]="itemsPerPage"
+        [(currentPage)]="currentPage"
+        [searchTerm]="searchTerm"
+        [pageSizeOptions]="[5, 10, 15, 20]"
+        [showAddButton]="false"
+        (searchTermChange)="filterTreatmentData($event)"
+        (currentPageChange)="currentPage = $event"
+        (sort)="sortTreatmentData($event)"
+      ></app-display-table>
+    </ng-container>
+
+    <!-- ✅ Show if no treatments -->
+    <ng-template #noData>
+      <p class="no-data-message">No treatment data available.</p>
+    </ng-template>
+  </ng-container>
+
+  <!-- ✅ Loading State -->
+  <ng-template #loading>
+    <p>Loading treatment details...</p>
+  </ng-template>
+</section>

@@ -2,28 +2,35 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DisplayTableComponent } from 'src/app/my-components/tables/display-table/display-table.component';
-import { PrescriptionData } from 'src/app/interfaces/patients.interface';
-import { PrescriptionService } from 'src/app/services/patients/patient-prescription-service';
-
+import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { select, Store } from '@ngrx/store';
+import { selectPrescriptionsByPatient, selectIsLoading, selectError } from 'src/app/ngrx/prescription/prescription.reducers';
+import { PrescriptionsActions } from 'src/app/ngrx/prescription/prescription.actions';
+import { Prescription } from 'src/app/interfaces/prescription.interface';
 
 @Component({
   selector: 'app-patient-prescription-table',
   standalone: true,
   imports: [CommonModule, DisplayTableComponent],
   templateUrl: './patient-prescription-table.component.html',
-  styleUrls: ['./patient-prescription-table.component.scss']
+  styleUrls: ['./patient-prescription-table.component.scss'],
 })
 export class PatientPrescriptionTableComponent implements OnInit {
+  pagetitle = 'Patient Prescriptions';
 
+  // ✅ Fetch prescriptions from NgRx Store
+  prescriptionData$: Observable<Prescription[]> = this.store.pipe(select(selectPrescriptionsByPatient));
+  isLoading$: Observable<boolean> = this.store.pipe(select(selectIsLoading));
+  errorMessage$: Observable<string | null> = this.store.pipe(select(selectError));
 
-  sortColumn: string = 'date'; // Default sort column
-  sortDirection: string = 'asc'; // Default sort direction
-  prescriptionData: PrescriptionData[] = [];
-  filteredPrescriptionData: PrescriptionData[] = [];
-  
+  // ✅ BehaviorSubjects for search term and sorting
+  private searchTermSubject = new BehaviorSubject<string>('');
+  searchTerm$ = this.searchTermSubject.asObservable();
 
-  errorMessage: string = ''; // Declare error message variable
-  isLoading: boolean = false; // Loading state
+  private sortColumnSubject = new BehaviorSubject<string>('date');
+  private sortDirectionSubject = new BehaviorSubject<'asc' | 'desc'>('asc');
+
+  filteredPrescriptionData$: Observable<Prescription[]>;
 
   columns = [
     { key: 'date', label: 'Date', sortable: true },
@@ -32,126 +39,84 @@ export class PatientPrescriptionTableComponent implements OnInit {
   ];
 
   itemsPerPage = 10;
-  searchTerm = '';
   currentPage = 1;
 
-  constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private prescriptionService: PrescriptionService
-  ) {}
+  constructor(private route: ActivatedRoute, private router: Router, private store: Store) {
+    // ✅ Combine Observables for filtering & sorting
+    this.filteredPrescriptionData$ = combineLatest([
+      this.prescriptionData$,
+      this.searchTerm$,
+      this.sortColumnSubject,
+      this.sortDirectionSubject,
+    ]).pipe(
+      map(([prescriptions, searchTerm, sortColumn, sortDirection]) => {
+        let filtered = prescriptions;
+
+        // ✅ Filter prescriptions based on search
+        if (searchTerm.trim()) {
+          filtered = prescriptions.filter((prescription) =>
+            Object.values(prescription)
+              .join(' ')
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())
+          );
+        }
+
+        // ✅ Format the date before displaying it in the table
+        filtered = filtered.map((prescription) => ({
+          ...prescription,
+          date: this.formatDate(prescription.date), // Format date
+        }));
+
+        // ✅ Sort filtered results
+        return [...filtered].sort((a, b) => {
+          const aValue = a[sortColumn as keyof Prescription] as string;
+          const bValue = b[sortColumn as keyof Prescription] as string;
+
+          return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        });
+      })
+    );
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
-      const patientId = Number(params.get('patientId')); // Retrieve patientId from route
-      console.log('Retrieved patientId from route:', patientId);
+      const patientId = Number(params.get('patientId'));
+      console.log('Extracted patientId:', patientId); // ✅ Debugging log
 
-      if (patientId) {
-        this.loadPrescriptions(patientId);
+      if (!isNaN(patientId) && patientId > 0) {
+        console.log('Dispatching action: loadPrescriptionsByPatientId');
+        this.store.dispatch(PrescriptionsActions.loadPrescriptionsByPatientId({ patientId }));
       } else {
-        this.errorMessage = 'Invalid patient ID.';
-        console.error(this.errorMessage);
+        console.error('Invalid patient ID detected, dispatching failure action');
+        this.store.dispatch(PrescriptionsActions.loadPrescriptionsByPatientIdFailure({ error: 'Invalid patient ID' }));
       }
     });
   }
 
-  // Load prescriptions for a specific patient
-  loadPrescriptions(patientId: number): void {
-    this.isLoading = true;
-
-    this.prescriptionService.getPrescriptions().subscribe({
-      next: (data: PrescriptionData[]) => {
-        // Filter prescriptions by `patientId`
-        const filteredData = data.filter((prescription) => prescription.patientId === patientId);
-
-        if (filteredData.length > 0) {
-          this.prescriptionData = filteredData;
-          this.filteredPrescriptionData = [...filteredData];
-          console.log('Prescriptions for patient:', filteredData);
-        } else {
-          this.errorMessage = `No prescriptions found for patient ID ${patientId}.`;
-          console.warn(this.errorMessage);
-        }
-
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to load prescriptions.';
-        console.error(this.errorMessage, err);
-        this.isLoading = false;
-      },
-    });
+  // ✅ Format date to a readable format
+  private formatDate(dateString: string): string {
+    if (!dateString) return ''; // Handle empty dates
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
   }
 
-  // Add a new prescription
-  addPrescription(newPrescription: PrescriptionData): void {
-    this.prescriptionService.addPrescription(newPrescription).subscribe({
-      next: (prescription) => {
-        this.prescriptionData.push(prescription);
-        this.filterprescriptionData(this.searchTerm); // Update filtered list
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to add prescription';
-        console.error(err);
-      }
-    });
+  // ✅ Updates the search term for filtering
+  filterPrescriptionData(search: string): void {
+    this.searchTermSubject.next(search.trim());
   }
 
-  // Update a prescription
-  updatePrescription(updatedPrescription: PrescriptionData): void {
-    this.prescriptionService.updatePrescription(updatedPrescription.id, updatedPrescription).subscribe({
-      next: () => {
-        const index = this.prescriptionData.findIndex((p) => p.id === updatedPrescription.id);
-        if (index > -1) {
-          this.prescriptionData[index] = updatedPrescription;
-          this.filterprescriptionData(this.searchTerm); // Update filtered list
-        }
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to update prescription';
-        console.error(err);
-      }
-    });
-  }
-
-  // Delete a prescription
-  deletePrescription(id: number): void {
-    this.prescriptionService.deletePrescription(id).subscribe({
-      next: () => {
-        this.prescriptionData = this.prescriptionData.filter((p) => p.id !== id);
-        this.filterprescriptionData(this.searchTerm); // Update filtered list
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to delete prescription';
-        console.error(err);
-      }
-    });
-  }
-
-  // Filter prescription data
-  filterprescriptionData(search: string): void {
-    this.searchTerm = search.trim();
-    if (this.searchTerm === '') {
-      this.filteredPrescriptionData = [...this.prescriptionData];
+  // ✅ Sorting function using BehaviorSubject
+  sortPrescriptionData(column: string): void {
+    if (this.sortColumnSubject.getValue() === column) {
+      this.sortDirectionSubject.next(this.sortDirectionSubject.getValue() === 'asc' ? 'desc' : 'asc');
     } else {
-      this.filteredPrescriptionData = this.prescriptionData.filter((prescription) =>
-        Object.values(prescription)
-          .join(' ')
-          .toLowerCase()
-          .includes(this.searchTerm.toLowerCase())
-      );
+      this.sortColumnSubject.next(column);
+      this.sortDirectionSubject.next('asc');
     }
   }
 
-  // Sort prescription data
-  sortprescriptionData(column: string): void {
-    this.sortColumn = column;
-    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-
-    this.filteredPrescriptionData.sort((a, b) => {
-      const valA = (a as any)[column]?.toString().toLowerCase() || '';
-      const valB = (b as any)[column]?.toString().toLowerCase() || '';
-      return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-    });
+  get searchTerm(): string {
+    return this.searchTermSubject.getValue(); // ✅ Retrieves the current search term
   }
 }

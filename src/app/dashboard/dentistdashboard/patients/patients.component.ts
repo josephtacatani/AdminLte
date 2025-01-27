@@ -51,7 +51,7 @@ export class PatientsComponent implements OnInit {
   ];
 
   constructor(private router: Router, private store: Store) {
-    // ✅ Combine patients, search term, and sorting dynamically
+    // ✅ Combine Observables for filtering & sorting
     this.filteredPatients$ = combineLatest([
       this.patients$,
       this.searchTerm$,
@@ -59,31 +59,12 @@ export class PatientsComponent implements OnInit {
       this.sortDirectionSubject
     ]).pipe(
       map(([patients, searchTerm, sortColumn, sortDirection]) => {
-        let filtered = patients;
-
-        // 🔍 Filter patients based on search term
-        if (searchTerm.trim()) {
-          filtered = patients.filter((patient) =>
-            Object.values(patient)
-              .join(' ')
-              .toLowerCase()
-              .includes(searchTerm.toLowerCase())
-          );
-        }
-
-        // 📌 Sorting logic
-        return [...filtered].sort((a, b) => {
-          const aValue = a[sortColumn as keyof Patient] as string | number;
-          const bValue = b[sortColumn as keyof Patient] as string | number;
-
-          if (typeof aValue === 'number' && typeof bValue === 'number') {
-            return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
-          } else {
-            return sortDirection === 'asc'
-              ? aValue.toString().localeCompare(bValue.toString())
-              : bValue.toString().localeCompare(aValue.toString());
-          }
-        });
+        let filtered = this.filterPatients(patients, searchTerm);
+        filtered = filtered.map(patient => ({
+          ...patient,
+          birthday: this.formatDate(patient.birthday),
+        }));
+        return this.sortPatients(filtered, sortColumn, sortDirection);
       })
     );
   }
@@ -92,18 +73,57 @@ export class PatientsComponent implements OnInit {
     this.store.dispatch(PatientsActions.loadPatients()); // ✅ Dispatch action to load patients
   }
 
+  // ✅ Format birthday
+  formatDate(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+
+  // ✅ Filter Patients based on search term
+  private filterPatients(patients: Patient[], searchTerm: string): Patient[] {
+    if (!searchTerm.trim()) return patients;
+    return patients.filter((patient) =>
+      `${patient.fullname} ${patient.email} ${patient.sex} ${patient.contact_number}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+  }
+
+  // ✅ Sort Patients efficiently
+  private sortPatients(
+    patients: Patient[],
+    sortColumn: string,
+    sortDirection: 'asc' | 'desc'
+  ): Patient[] {
+    return [...patients].sort((a, b) => {
+      const aValue = a[sortColumn as keyof Patient];
+      const bValue = b[sortColumn as keyof Patient];
+
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+      }
+
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+
+      return 0;
+    });
+  }
+
   // ✅ Getter for search term
   get searchTerm(): string {
     return this.searchTermSubject.getValue();
   }
 
   // 🔍 Updates the search term dynamically
-  filterPatients(search: string): void {
+  filterPatientsBySearch(search: string): void {
     this.searchTermSubject.next(search.trim());
   }
 
   // 📌 Sort patients by column
-  sortPatients(column: string): void {
+  sortPatientsByColumn(column: string): void {
     if (this.sortColumnSubject.getValue() === column) {
       this.sortDirectionSubject.next(this.sortDirectionSubject.getValue() === 'asc' ? 'desc' : 'asc');
     } else {
