@@ -21,34 +21,39 @@
         </div>
         <div class="modal-body">
           <form [formGroup]="dentalHistoryForm" (ngSubmit)="submitDentalHistory()">
+
+            <!-- Previous Dentist Field -->
             <div class="form-group">
-              <label for="previousDentist">Previous Dentist <span class="text-danger">*</span></label>
+              <label for="previous_dentist">Previous Dentist <span class="text-danger">*</span></label>
               <input
                 type="text"
                 class="form-control"
-                id="previousDentist"
-                formControlName="previousDentist"
+                id="previous_dentist"
+                formControlName="previous_dentist"
                 [attr.aria-required]="true"
-                [attr.aria-invalid]="dentalHistoryForm.get('previousDentist')?.invalid"
+                [attr.aria-invalid]="dentalHistoryForm.get('previous_dentist')?.invalid"
               />
-              <div *ngIf="dentalHistoryForm.get('previousDentist')?.hasError('required') && dentalHistoryForm.get('previousDentist')?.touched" class="text-danger">
+              <div *ngIf="dentalHistoryForm.get('previous_dentist')?.hasError('required') && dentalHistoryForm.get('previous_dentist')?.touched" class="text-danger">
                 Previous Dentist is required.
               </div>
             </div>
+
+            <!-- Last Dental Visit Field -->
             <div class="form-group">
-              <label for="lastDentalVisit">Last Dental Visit <span class="text-danger">*</span></label>
+              <label for="last_dentist_visit">Last Dental Visit <span class="text-danger">*</span></label>
               <input
                 type="date"
                 class="form-control"
-                id="lastDentalVisit"
-                formControlName="lastDentalVisit"
+                id="last_dentist_visit"
+                formControlName="last_dentist_visit"
                 [attr.aria-required]="true"
-                [attr.aria-invalid]="dentalHistoryForm.get('lastDentalVisit')?.invalid"
+                [attr.aria-invalid]="dentalHistoryForm.get('last_dentist_visit')?.invalid"
               />
-              <div *ngIf="dentalHistoryForm.get('lastDentalVisit')?.hasError('required') && dentalHistoryForm.get('lastDentalVisit')?.touched" class="text-danger">
+              <div *ngIf="dentalHistoryForm.get('last_dentist_visit')?.hasError('required') && dentalHistoryForm.get('last_dentist_visit')?.touched" class="text-danger">
                 Last Dental Visit is required.
               </div>
             </div>
+
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" (click)="close()">Close</button>
               <button type="submit" class="btn btn-primary" [disabled]="dentalHistoryForm.invalid">Submit</button>

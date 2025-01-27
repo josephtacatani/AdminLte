@@ -81,9 +81,6 @@ export class PatientTreatmentTableComponent implements OnInit {
       })
     );
 
-    this.filteredTreatmentData$.subscribe((data) => {
-      console.log('Filtered Treatment Data from Component:', data);
-    });
   }
 
   ngOnInit(): void {

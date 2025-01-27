@@ -1,23 +1,41 @@
-<app-table-with-edit-delete
-  [data]="filteredDentalHistoryData"
-  [columns]="columns"
-  [itemsPerPage]="itemsPerPage"
-  [(currentPage)]="currentPage"
-  [(searchTerm)]="searchTerm"
-  [pageSizeOptions]="[5, 10, 15, 20]"
-  [showAddButton]="true"
-  (searchTermChange)="filterDentalHistoryData($event)"
-  (currentPageChange)="currentPage = $event"
-  (sort)="sortDentalHistoryData($event)"
-  (actionClick)="handleActionClick($event)"
-  (add)="openAddEditModal()"
-></app-table-with-edit-delete>
+<section>
+  <ng-container *ngIf="filteredDentalHistories$ | async as dentalHistories; else loading">
+    <ng-container *ngIf="dentalHistories.length > 0; else noData">
+      <app-table-with-edit-delete
+        [title]="pagetitle + ' List'"
+        [data]="dentalHistories || []"
+        [columns]="columns"
+        [itemsPerPage]="itemsPerPage"
+        [(currentPage)]="currentPage"
+        [searchTerm]="searchTerm"
+        [pageSizeOptions]="[5, 10, 15, 20]"
+        [showAddButton]="true"
+        (searchTermChange)="filterDentalHistories($event)"
+        (currentPageChange)="currentPage = $event"
+        (sort)="sortDentalHistories($event)"
+        (actionClick)="handleActionClick($event)"
+        (add)="openAddEditModal()"
+      ></app-table-with-edit-delete>
+    </ng-container>
+
+    <!-- ✅ Show if no dental history data -->
+    <ng-template #noData>
+      <p class="no-data-message">No dental history records available.</p>
+    </ng-template>
+  </ng-container>
+
+  <!-- ✅ Loading State -->
+  <ng-template #loading>
+    <p>Loading dental history details...</p>
+  </ng-template>
+</section>
 
 <!-- Add/Edit Dental History Modal -->
 <app-add-edit-dental-history
   [isVisible]="isAddEditModalVisible"
   [title]="modalTitle"
-  [dentalHistoryData]="selectedDentalHistory"
-  (closeModal)="closeAddDentalHistoryModal()"
-  (submitModal)="handleDentalHistorySubmit($event)"
+  [dentalHistory]="selectedDentalHistory"
+  (close)="closeAddDentalHistoryModal()"
+  (submitModal)="handleDentalHistorySubmit($event)"  
 ></app-add-edit-dental-history>
+

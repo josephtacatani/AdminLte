@@ -17,6 +17,8 @@ import { Store } from '@ngrx/store';
 import { selectPatients, selectSelectedPatient } from 'src/app/ngrx/patients/patients.reducers';
 import { PatientsActions } from 'src/app/ngrx/patients/patients.actions';
 import { decodeAccessToken } from 'src/app/services/auth/auth.utils';
+import { DentalHistoryActions } from 'src/app/ngrx/dental_history/dental_history.actions';
+import { DentalHistory } from 'src/app/interfaces/dental_history.interface';
 
 @Component({
   selector: 'app-patient-details',
@@ -80,8 +82,9 @@ export class PatientDetailsComponent implements OnInit {
     this.isAddMedicalHistoryModalVisible = false;
   }
 
-  handleDentalHistorySubmit(dentalHistory: any): void {
+  handleDentalHistorySubmit(dentalHistory: DentalHistory): void {
     console.log('Dental History Submitted:', dentalHistory);
+    this.store.dispatch(DentalHistoryActions.createDentalHistory({ dentalHistory }));
     this.closeAddDentalHistoryModal();
   }
 

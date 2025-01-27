@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { DentalHistory, DentalHistoryResponse, DentalHistoriesListResponse } from 'src/app/interfaces/dental_history.interface';
+import { DentalHistory, DentalHistoryResponse, DentalHistoriesListResponse } from '../../interfaces/dental_history.interface';
 import { environment } from 'src/environments/environment.prod';
 
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class DentalHistoryService {
   private apiUrl = `${environment.apiUrl}/dental_histories`;
@@ -17,7 +17,7 @@ export class DentalHistoryService {
     return this.http.get<DentalHistoriesListResponse>(`${this.apiUrl}`);
   }
 
-  getDentalHistoryByPatientId(patientId: number): Observable<DentalHistoriesListResponse> {
+  getDentalHistoriesByPatientId(patientId: number): Observable<DentalHistoriesListResponse> {
     return this.http.get<DentalHistoriesListResponse>(`${this.apiUrl}/by-patient/${patientId}`);
   }
 
@@ -25,8 +25,8 @@ export class DentalHistoryService {
     return this.http.get<DentalHistoryResponse>(`${this.apiUrl}/${id}`);
   }
 
-  addDentalHistory(dentalHistory: Partial<DentalHistory>): Observable<DentalHistoryResponse> {
-    return this.http.post<DentalHistoryResponse>(this.apiUrl, dentalHistory);
+  createDentalHistory(dentalHistory: Partial<DentalHistory>): Observable<DentalHistoryResponse> {
+    return this.http.post<DentalHistoryResponse>(`${this.apiUrl}`, dentalHistory);
   }
 
   updateDentalHistory(id: number, dentalHistory: Partial<DentalHistory>): Observable<DentalHistoryResponse> {

@@ -26,6 +26,8 @@ import { prescriptionsFeatureKey, prescriptionsReducer } from './ngrx/prescripti
 import { PrescriptionsEffects } from './ngrx/prescription/prescription.effects';
 import { treatmentFeatureKey, treatmentReducer } from './ngrx/treatments/treatments.reducers';
 import { TreatmentEffects } from './ngrx/treatments/treatments.effects';
+import { dentalHistoryFeatureKey, dentalHistoryReducer } from './ngrx/dental_history/dental_history.reducers';
+import { DentalHistoryEffects } from './ngrx/dental_history/dental_history.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -41,7 +43,8 @@ export const appConfig: ApplicationConfig = {
       [appointmentFeatureKey]: appointmentReducer,
       [servicesFeatureKey]: servicesReducer,
       [prescriptionsFeatureKey]: prescriptionsReducer,
-      [treatmentFeatureKey]: treatmentReducer
+      [treatmentFeatureKey]: treatmentReducer,
+      [dentalHistoryFeatureKey]:dentalHistoryReducer
     }),
     provideEffects([
       AuthEffects, 
@@ -52,7 +55,8 @@ export const appConfig: ApplicationConfig = {
       AppointmentEffects,
       ServicesEffects,
       PrescriptionsEffects,
-      TreatmentEffects
+      TreatmentEffects,
+      DentalHistoryEffects
     ]),  // <-- Ensure AuthEffects is provided
     provideStoreDevtools({
       maxAge: 25,
