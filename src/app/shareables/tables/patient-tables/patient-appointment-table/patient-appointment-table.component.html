@@ -1,15 +1,36 @@
 <section>
-    <app-display-table
-    [data]="filteredAppointmentDetails"
-    [columns]="columns"
-    [itemsPerPage]="itemsPerPage"
-    [(currentPage)]="currentPage"
-    [(searchTerm)]="searchTerm"
-    [pageSizeOptions]="[5, 10, 15, 20]"
-    [showAddButton]="false"
-    (searchTermChange)="filterAppointmentDetails($event)"
-    (currentPageChange)="currentPage = $event"
-    (sort)="sortAppointmentDetails($event)"
-  ></app-display-table>
-  </section>
-  
+  <ng-container *ngIf="filteredAppointments$ | async as appointments; else loading">
+    <ng-container *ngIf="appointments.length > 0; else noData">
+      <app-display-table
+        [title]="pagetitle + ' List'"
+        [data]="appointments || []"
+        [columns]="columns"
+        [itemsPerPage]="itemsPerPage"
+        [(currentPage)]="currentPage"
+        [searchTerm]="searchTerm"
+        [pageSizeOptions]="[5, 10, 15, 20]"
+        [showAddButton]="false"
+        (searchTermChange)="filterAppointmentDetails($event)"
+        (currentPageChange)="currentPage = $event"
+        (sort)="sortAppointmentDetails($event)"
+      >
+        <!-- ✅ Custom Column for Status -->
+        <ng-template #statusTemplate let-appointment="row">
+          <span [ngClass]="getStatusClass(appointment.status)">
+            {{ appointment.status }}
+          </span>
+        </ng-template>
+      </app-display-table>
+    </ng-container>
+
+    <!-- ✅ Show this if there are no appointments -->
+    <ng-template #noData>
+      <p class="no-data-message">No appointment data available.</p>
+    </ng-template>
+  </ng-container>
+
+  <!-- ✅ Loading State -->
+  <ng-template #loading>
+    <p>Loading appointment details...</p>
+  </ng-template>
+</section>

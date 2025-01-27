@@ -18,5 +18,9 @@ export const AuthActions = createActionGroup({
     // ✅ Add actions to clear messages after 3s
     'Clear Message': emptyProps(),
     'Clear Error': emptyProps(),
+
+        // ✅ Add actions for token expiry warning
+        'Show Token Expiry Modal': emptyProps(),
+        'Update Logout Countdown': props<{ remaining: number }>(),
   }
 });

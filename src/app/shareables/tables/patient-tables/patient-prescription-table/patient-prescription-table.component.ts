@@ -14,10 +14,14 @@ import { PrescriptionService } from 'src/app/services/patients/patient-prescript
   styleUrls: ['./patient-prescription-table.component.scss']
 })
 export class PatientPrescriptionTableComponent implements OnInit {
+
+
   sortColumn: string = 'date'; // Default sort column
   sortDirection: string = 'asc'; // Default sort direction
   prescriptionData: PrescriptionData[] = [];
   filteredPrescriptionData: PrescriptionData[] = [];
+  
+
   errorMessage: string = ''; // Declare error message variable
   isLoading: boolean = false; // Loading state
 

@@ -11,6 +11,12 @@ import { PatientDentalhistoryTableComponent } from 'src/app/shareables/tables/pa
 import { AddEditMedicalHistoryComponent } from 'src/app/my-components/modals/add-edit-medical-history/add-edit-medical-history.component';
 import { PatientMedicalhistoryTableComponent } from 'src/app/shareables/tables/patient-tables/patient-medicalhistory-table/patient-medicalhistory-table.component';
 import { PatientTreatmentTableComponent } from 'src/app/shareables/tables/patient-tables/patient-treatment-table/patient-treatment-table.component';
+import { Patient } from 'src/app/interfaces/patient_details.interface';
+import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectPatients, selectSelectedPatient } from 'src/app/ngrx/patients/patients.reducers';
+import { PatientsActions } from 'src/app/ngrx/patients/patients.actions';
+import { decodeAccessToken } from 'src/app/services/auth/auth.utils';
 
 @Component({
   selector: 'app-patient-details',
@@ -35,56 +41,26 @@ export class PatientDetailsComponent implements OnInit {
 
   errorMessage = '';
   isLoading = false;
-  patientData: PatientData | null = null; // Change to a single patient object
+  patientData$: Observable<Patient | null> = this.store.select(selectSelectedPatient);
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private patientDataService: PatientDataService
+    private store: Store,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    // Ensure you're retrieving `patientId` correctly from the route
-    this.route.paramMap.subscribe((params) => {
-      const patientId = Number(params.get('patientId')); // Use the correct parameter name
-      console.log('Retrieved patientId from route:', patientId); // Log the retrieved ID
+    this.store.dispatch(PatientsActions.loadPatients()); // Load the selected patient
+   
+
+    const patientId = Number(this.route.snapshot.paramMap.get('patientId')); // ✅ Get patientId from the URL
+
+    if (patientId) {
+      this.store.dispatch(PatientsActions.loadPatient({ id: patientId })); // ✅ Dispatch action to load the patient
+    }
   
-      if (patientId) {
-        this.loadPatientDetails(patientId);
-      } else {
-        this.errorMessage = 'Invalid patient ID.';
-        console.error(this.errorMessage); // Log the error message
-      }
-    });
+  
   }
   
-  loadPatientDetails(patientId: number): void {
-    this.isLoading = true;
-    console.log('Loading details for patient with patientId:', patientId); // Log the ID being loaded
-  
-    this.patientDataService.getPatients().subscribe({
-      next: (patients: PatientData[]) => {
-        console.log('Fetched patients from service:', patients); // Log all fetched patients
-  
-        // Find patient based on `patientId`
-        const patient = patients.find((p) => p.patientId === patientId);
-        if (patient) {
-          this.patientData = patient;
-          console.log('Found patient:', this.patientData); // Log the found patient
-        } else {
-          this.errorMessage = `No patient found with patientId ${patientId}.`;
-          console.warn(this.errorMessage); // Log a warning if no patient is found
-        }
-  
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to load patient details.';
-        console.error(this.errorMessage, err); // Log the error message and error object
-        this.isLoading = false;
-      },
-    });
-  }
   
 
   // Methods for modals

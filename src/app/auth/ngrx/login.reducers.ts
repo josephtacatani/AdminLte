@@ -11,6 +11,8 @@ export interface AuthState {
   refreshError: string | null;
   logoutMessage: string | null;
   logoutError: string | null;
+  showTokenExpiryModal: boolean;
+  logoutCountdown: number;
 }
 
 export const initialAuthState: AuthState = {
@@ -22,6 +24,8 @@ export const initialAuthState: AuthState = {
   refreshError: null,
   logoutMessage: null,
   logoutError: null,
+  showTokenExpiryModal: false,
+  logoutCountdown: 60, // Default 60s before logout
 };
 
 export const authFeature = createFeature({
@@ -120,7 +124,26 @@ export const authFeature = createFeature({
       isLoading: false,
       logoutMessage: null,
       logoutError: error,
-    }))
+    })),
+
+      // ✅ Update Logout Countdown
+  on(AuthActions.updateLogoutCountdown, (state, { remaining }) => ({
+    ...state,
+    logoutCountdown: remaining
+  })),
+
+  // ✅ Hide Modal on Logout or Token Refresh
+  on(AuthActions.logout, (state) => ({
+    ...state,
+    showTokenExpiryModal: false,
+    logoutCountdown: 60
+  })),
+
+  on(AuthActions.refreshToken, (state) => ({
+    ...state,
+    showTokenExpiryModal: false,
+    logoutCountdown: 60
+  }))
   ),
 });
 
@@ -135,4 +158,6 @@ export const {
   selectRefreshError,
   selectLogoutMessage,
   selectLogoutError,
+  selectLogoutCountdown,
+  selectShowTokenExpiryModal
 } = authFeature;

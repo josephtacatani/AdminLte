@@ -14,6 +14,7 @@ export class ConfirmModalComponent {
   @Input() message: string = 'Are you sure?'; // Modal message
   @Input() confirmText: string = 'Confirm'; // Confirm button text
   @Input() cancelText: string = 'Cancel'; // Cancel button text
+  @Input() countdown: number = 60; // ✅ Show countdown
 
   @Output() closeModal = new EventEmitter<void>(); // Emits when closing modal
   @Output() confirmAction = new EventEmitter<void>(); // Emits when confirming action

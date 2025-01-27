@@ -8,7 +8,7 @@ import { Patient, PatientResponse, PatientsListResponse } from 'src/app/interfac
   providedIn: 'root',
 })
 export class PatientsService {
-  private apiUrl = `${environment.apiUrl}`; // ✅ Ensure correct endpoint
+  private apiUrl = `${environment.apiUrl}/patients`; // ✅ Ensure correct endpoint
 
   constructor(private http: HttpClient) {}
 
@@ -19,7 +19,7 @@ export class PatientsService {
 
   // ✅ Get a specific patient by user ID
   getPatientByUserId(id: number): Observable<PatientResponse> {
-    return this.http.get<PatientResponse>(`${this.apiUrl}/patients/${id}`).pipe(
+    return this.http.get<PatientResponse>(`${this.apiUrl}/${id}`).pipe(
       tap(response => console.log('API Response:', response)), // ✅ Debug output
       catchError(error => throwError(() => new Error(error.error?.message || 'Error fetching patient')))
     );

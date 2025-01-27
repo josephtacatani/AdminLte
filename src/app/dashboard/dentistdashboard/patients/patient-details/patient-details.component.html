@@ -22,17 +22,19 @@
               <div class="row">
                 <!-- Patient Info Card -->
                 <div class="col-12 col-md-3 mb-3">
-                  <app-info-card
-                    [title]="'Patient Info'"
-                    [imageSrc]="'assets/img/user4-128x128.jpg'"
-                    [name]="(patientData?.firstName ?? '') + ' ' + (patientData?.lastName ?? '')"
-                    [subtitle]="patientData?.email ?? ''"
-                    [details]="[
-                      { label: 'Birthdate', value: patientData?.dateOfBirth ?? 'N/A' },
-                      { label: 'Phone', value: patientData?.mobileNumber ?? 'N/A' },
-                      { label: 'Address', value: patientData?.address ?? 'N/A' }
-                    ]"
-                  ></app-info-card>
+                  <ng-container *ngIf="patientData$ | async as patientData; ">
+                    <app-info-card
+                      [title]="'Patient Info'"
+                      [imageSrc]="patientData.photo"
+                      [name]="patientData.fullname"
+                      [subtitle]="patientData.email"
+                      [details]="[
+                        { label: 'Birthdate', value: patientData.birthday},
+                        { label: 'Phone', value: patientData.contact_number},
+                        { label: 'Address', value: patientData.address }
+                      ]"
+                    ></app-info-card>
+                  </ng-container>
                 </div>
                 
                 <!-- Appointment and Prescription Section -->

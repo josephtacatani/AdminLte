@@ -1,10 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Store, select } from '@ngrx/store';
+import { Observable, BehaviorSubject, combineLatest, map } from 'rxjs';
 import { TableComponent } from 'src/app/my-components/tables/table/table.component';
-import { PatientDataService } from 'src/app/services/patients/patient-data-service';
-import { PatientData } from 'src/app/interfaces/patients.interface';
-
+import { Patient } from 'src/app/interfaces/patient_details.interface';
+import { PatientsActions } from 'src/app/ngrx/patients/patients.actions';
+import { selectPatients, selectIsLoading, selectError } from 'src/app/ngrx/patients/patients.reducers';
+import { DisplayTableComponent } from 'src/app/my-components/tables/display-table/display-table.component';
 
 @Component({
   selector: 'app-patients',
@@ -15,19 +18,30 @@ import { PatientData } from 'src/app/interfaces/patients.interface';
 })
 export class PatientsComponent implements OnInit {
   pagetitle = 'Patients';
-  sortColumn: string = 'name'; // Default sort column
-  sortDirection: string = 'asc'; // Default sort direction
 
-  originalPatients: PatientData[] = [];
-  filteredPatients: PatientData[] = [];
-  errorMessage: string = '';
+  // ✅ Fetch patients from NgRx Store
+  patients$: Observable<Patient[]> = this.store.pipe(select(selectPatients));
+  isLoading$: Observable<boolean> = this.store.pipe(select(selectIsLoading));
+  errorMessage$: Observable<string | null> = this.store.pipe(select(selectError));
+
+  // ✅ BehaviorSubjects for search and sorting
+  private searchTermSubject = new BehaviorSubject<string>('');
+  searchTerm$ = this.searchTermSubject.asObservable();
+
+  private sortColumnSubject = new BehaviorSubject<string>('fullname'); // Default sorting column
+  private sortDirectionSubject = new BehaviorSubject<'asc' | 'desc'>('asc');
+
+  filteredPatients$: Observable<Patient[]>;
+
+  currentPage = 1;
+  itemsPerPage = 10;
 
   columns = [
     { key: 'photo', label: 'Photo', render: (data: any) => `<img src="${data}" class="img-thumbnail" width="50" alt="Photo">`, sortable: false },
-    { key: 'name', label: 'PatientData', sortable: true },
+    { key: 'fullname', label: 'Name', sortable: true },
     { key: 'birthday', label: 'Birthday', sortable: true },
-    { key: 'gender', label: 'Gender', sortable: true },
-    { key: 'contact', label: 'Contact', sortable: false },
+    { key: 'sex', label: 'Gender', sortable: true },
+    { key: 'contact_number', label: 'Contact', sortable: false },
     { key: 'email', label: 'Email', sortable: true },
     { key: 'action', label: 'Action', sortable: false }
   ];
@@ -36,57 +50,70 @@ export class PatientsComponent implements OnInit {
     { label: 'View', icon: 'fas fa-eye', callback: 'view' }
   ];
 
-  itemsPerPage = 10;
-  searchTerm = '';
-  currentPage = 1;
+  constructor(private router: Router, private store: Store) {
+    // ✅ Combine patients, search term, and sorting dynamically
+    this.filteredPatients$ = combineLatest([
+      this.patients$,
+      this.searchTerm$,
+      this.sortColumnSubject,
+      this.sortDirectionSubject
+    ]).pipe(
+      map(([patients, searchTerm, sortColumn, sortDirection]) => {
+        let filtered = patients;
 
-  constructor(private router: Router, private patientDataService: PatientDataService) {}
+        // 🔍 Filter patients based on search term
+        if (searchTerm.trim()) {
+          filtered = patients.filter((patient) =>
+            Object.values(patient)
+              .join(' ')
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())
+          );
+        }
+
+        // 📌 Sorting logic
+        return [...filtered].sort((a, b) => {
+          const aValue = a[sortColumn as keyof Patient] as string | number;
+          const bValue = b[sortColumn as keyof Patient] as string | number;
+
+          if (typeof aValue === 'number' && typeof bValue === 'number') {
+            return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+          } else {
+            return sortDirection === 'asc'
+              ? aValue.toString().localeCompare(bValue.toString())
+              : bValue.toString().localeCompare(aValue.toString());
+          }
+        });
+      })
+    );
+  }
 
   ngOnInit(): void {
-    this.loadPatients();
+    this.store.dispatch(PatientsActions.loadPatients()); // ✅ Dispatch action to load patients
   }
 
-  loadPatients(): void {
-    this.patientDataService.getPatients().subscribe({
-      next: (data: PatientData[]) => {
-        this.originalPatients = data;
-        this.filteredPatients = [...this.originalPatients];
-        this.sortPatients(this.sortColumn); // Apply default sorting
-      },
-      error: (err) => {
-        this.errorMessage = 'Failed to load patients.';
-        console.error(err);
-      }
-    });
+  // ✅ Getter for search term
+  get searchTerm(): string {
+    return this.searchTermSubject.getValue();
   }
 
+  // 🔍 Updates the search term dynamically
   filterPatients(search: string): void {
-    this.searchTerm = search.trim();
-    if (!this.searchTerm) {
-      this.filteredPatients = [...this.originalPatients];
+    this.searchTermSubject.next(search.trim());
+  }
+
+  // 📌 Sort patients by column
+  sortPatients(column: string): void {
+    if (this.sortColumnSubject.getValue() === column) {
+      this.sortDirectionSubject.next(this.sortDirectionSubject.getValue() === 'asc' ? 'desc' : 'asc');
     } else {
-      this.filteredPatients = this.originalPatients.filter((patient) =>
-        Object.values(patient)
-          .join(' ')
-          .toLowerCase()
-          .includes(this.searchTerm.toLowerCase())
-      );
+      this.sortColumnSubject.next(column);
+      this.sortDirectionSubject.next('asc');
     }
   }
 
-  sortPatients(column: string): void {
-    this.sortColumn = column;
-    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-
-    this.filteredPatients.sort((a: any, b: any) => {
-      const valA = a[column]?.toString().toLowerCase() || '';
-      const valB = b[column]?.toString().toLowerCase() || '';
-      return this.sortDirection === 'asc' ? valA.localeCompare(valB) : valB.localeCompare(valA);
-    });
-  }
-
   handleRowAction(rowData: any): void {
-    this.navigateToPatientDetails(rowData.id);
+    this.navigateToPatientDetails(rowData.user_id);
   }
 
   navigateToPatientDetails(patientId: number): void {
@@ -95,17 +122,7 @@ export class PatientsComponent implements OnInit {
 
   handleActionClick(event: { action: string; row: any }): void {
     if (event.action === 'view') {
-      this.navigateToPatientDetails(event.row.patientId);
+      this.navigateToPatientDetails(event.row.user_id);
     }
-  }
-
-  openEditPatientModal(patientId: number): void {
-    console.log('Editing patient with ID:', patientId);
-    // Open edit modal logic here
-  }
-  
-  confirmDeletePatient(patientId: number): void {
-    console.log('Deleting patient with ID:', patientId);
-    // Confirm and delete logic here
   }
 }

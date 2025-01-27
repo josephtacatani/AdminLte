@@ -1,2 +1,12 @@
+<app-confirm-modal
+  [isVisible]="(showTokenExpiryModal$ | async) ?? false"
+  title="Session Expiring Soon!"
+  message="Your session is about to expire. Stay logged in?"
+  confirmText="Stay Logged In"
+  cancelText="Logout"
+  [countdown]="(logoutCountdown$ | async) ?? 60"
+  (closeModal)="onLogout()"
+  (confirmAction)="onRefreshToken()"
+></app-confirm-modal>
 
 <router-outlet></router-outlet>

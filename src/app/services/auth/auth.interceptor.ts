@@ -1,42 +1,77 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, from } from 'rxjs';
-import { catchError, switchMap } from 'rxjs/operators';
+import { Observable, throwError, from, timer } from 'rxjs';
+import { catchError, switchMap, tap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AuthService } from './auth.service';
 import { AuthActions } from 'src/app/auth/ngrx/login.actions';
+import { Router } from '@angular/router';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
   private isRefreshing = false;
-  private refreshTokenInProgress: Promise<string | null> = Promise.resolve(null); // ✅ Ensure always a Promise
+  private refreshTokenInProgress: Promise<string | null> = Promise.resolve(null);
+  private countdownStarted = false;
 
-  constructor(private authService: AuthService, private store: Store) {}
+  constructor(private authService: AuthService, private store: Store, private router: Router) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let authReq = req;
-    const accessToken = sessionStorage.getItem('accessToken'); // ✅ Retrieve Access Token
+    const accessToken = sessionStorage.getItem('accessToken');
 
     if (accessToken) {
       authReq = this.addToken(req, accessToken);
+      this.monitorTokenExpiry(); // ✅ Start monitoring token expiry
     }
 
     return next.handle(authReq).pipe(
       catchError((error) => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
-          // ✅ Skip refresh if this is a login request (avoid overriding login errors)
-          if (req.url.includes('/auth/login')) { 
-            return throwError(() => error); // ✅ Let NgRx handle the login error message
+          if (req.url.includes('/auth/login')) {
+            return throwError(() => error);
           }
-          return this.handle401Error(req, next); // ✅ Only refresh if NOT a login request
+          return this.handle401Error(req, next);
         }
         return throwError(() => error);
       })
     );
   }
 
+  private monitorTokenExpiry(): void {
+    if (this.countdownStarted) return;
+    this.countdownStarted = true;
+  
+    const expiresAt = Number(sessionStorage.getItem('accessTokenExpiry'));
+    const now = Date.now();
+    const timeUntilExpiry = expiresAt - now;
+    const warningTime = 60 * 1000; // Show modal 1 minute before expiry
+  
+    if (timeUntilExpiry > warningTime) {
+      timer(timeUntilExpiry - warningTime).subscribe(() => {
+        this.store.dispatch(AuthActions.showTokenExpiryModal());
+      });
+    }
+  }
+  
+
+  private startLogoutCountdown(seconds: number): void {
+    let remaining = seconds;
+    const interval = setInterval(() => {
+      this.store.dispatch(AuthActions.updateLogoutCountdown({ remaining }));
+
+      if (remaining <= 0) {
+        clearInterval(interval);
+        this.store.dispatch(AuthActions.logout({ refreshToken: localStorage.getItem('refreshToken')! }));
+        sessionStorage.clear();
+        localStorage.clear();
+        this.router.navigate(['/auth/login']);
+      }
+      remaining--;
+    }, 1000);
+  }
+
   private handle401Error(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (!this.isRefreshing && this.isAccessTokenExpired()) { // ✅ Only refresh if expired
+    if (!this.isRefreshing && this.isAccessTokenExpired()) {
       this.isRefreshing = true;
       this.refreshTokenInProgress = this.refreshAccessToken();
     }
@@ -51,12 +86,12 @@ export class AuthInterceptor implements HttpInterceptor {
           return next.handle(this.addToken(req, newToken));
         }
 
-        return throwError(() => new Error('Token refresh failed')); // ✅ Do not override login errors
+        return throwError(() => new Error('Token refresh failed'));
       }),
       catchError((error) => {
         this.isRefreshing = false;
         this.refreshTokenInProgress = Promise.resolve(null);
-        return throwError(() => error); // ✅ Pass original error instead of overriding
+        return throwError(() => error);
       })
     );
   }
@@ -65,22 +100,14 @@ export class AuthInterceptor implements HttpInterceptor {
     const refreshToken = localStorage.getItem('refreshToken');
     if (!refreshToken) return Promise.resolve(null);
 
-    const expiresAt = Number(sessionStorage.getItem('accessTokenExpiry'));
-    const now = Date.now();
-
-    // ✅ Refresh only if the token is actually expired (not just close to expiry)
-    if (expiresAt > now) {
-      return Promise.resolve(sessionStorage.getItem('accessToken'));
-    }
-
     return new Promise((resolve, reject) => {
       this.authService.refreshTokenApi(refreshToken).subscribe({
         next: (response) => {
           sessionStorage.setItem('accessToken', response.accessToken);
-          sessionStorage.setItem('accessTokenExpiry', (now + 15 * 60 * 1000).toString()); // Assume 15 min validity
+          sessionStorage.setItem('accessTokenExpiry', (Date.now() + 15 * 60 * 1000).toString());
           resolve(response.accessToken);
         },
-        error: () => reject(null), // ✅ Avoid throwing error here
+        error: () => reject(null),
       });
     });
   }
@@ -95,7 +122,8 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private isAccessTokenExpired(): boolean {
     const expiresAt = Number(sessionStorage.getItem('accessTokenExpiry'));
-    return !expiresAt || expiresAt < Date.now(); // ✅ Always returns boolean
+    return !expiresAt || expiresAt < Date.now();
   }
+
   
 }
