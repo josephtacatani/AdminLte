@@ -8,27 +8,32 @@ import {
   selectSelectedDentalHistoriesByPatientId, 
   selectSelectedDentalHistory, // ✅ Add this selector
   selectError, 
-  selectLoading 
+  selectLoading, 
+  selectMessageDental
 } from 'src/app/ngrx/dental_history/dental_history.reducers';
 import { DentalHistoryActions } from 'src/app/ngrx/dental_history/dental_history.actions';
 import { TableWithEditDeleteComponent } from 'src/app/my-components/tables/table-with-edit-delete/table-with-edit-delete.component';
 import { AddEditDentalHistoryComponent } from 'src/app/my-components/modals/add-edit-dental-history/add-edit-dental-history.component';
+import { AlertComponent } from 'src/app/my-components/alert/alert.component';
+import { ConfirmModalComponent } from 'src/app/my-components/modals/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-patient-dentalhistory-table',
   standalone: true,
-  imports: [CommonModule, TableWithEditDeleteComponent, AddEditDentalHistoryComponent],
+  imports: [CommonModule, TableWithEditDeleteComponent, AddEditDentalHistoryComponent, AlertComponent, ConfirmModalComponent],
   templateUrl: './patient-dentalhistory-table.component.html',
   styleUrls: ['./patient-dentalhistory-table.component.scss'],
 })
 export class PatientDentalhistoryTableComponent implements OnInit {
   pagetitle = 'Patient Dental History';
-
+  isAddDentalHistoryModalVisible = false;
   // ✅ Fetch dental history data from NgRx Store
   dentalHistories$: Observable<DentalHistory[]> = this.store.pipe(select(selectSelectedDentalHistoriesByPatientId));
   selectedDentalHistory$: Observable<DentalHistory | null> = this.store.pipe(select(selectSelectedDentalHistory)); // ✅ Fetch single history
   isLoading$: Observable<boolean> = this.store.pipe(select(selectLoading));
   errorMessage$: Observable<string | null> = this.store.pipe(select(selectError));
+  selectDentalMessage$: Observable<string | null> = this.store.pipe(select(selectMessageDental));
+
 
   private searchTermSubject = new BehaviorSubject<string>('');
   searchTerm$ = this.searchTermSubject.asObservable();
@@ -49,6 +54,10 @@ export class PatientDentalhistoryTableComponent implements OnInit {
   isAddEditModalVisible = false;
   modalTitle = '';
   selectedDentalHistory: DentalHistory | null = null;
+  isConfirmModalVisible = false;
+  confirmModalMessage = 'Are you sure you want to delete this dental history?';
+  selectedDentalHistoryId: number | null = null;
+  selectedPatientId: number | null = null;
 
   constructor(private route: ActivatedRoute, private router: Router, private store: Store, private cdr: ChangeDetectorRef) {
     this.filteredDentalHistories$ = combineLatest([
@@ -79,6 +88,11 @@ export class PatientDentalhistoryTableComponent implements OnInit {
         });
       })
     );
+
+    this.selectedDentalHistory$.subscribe(dentalHistory => {
+      this.selectedDentalHistory = dentalHistory; // ✅ Store in local variable
+    });
+
   }
 
   ngOnInit(): void {
@@ -111,65 +125,100 @@ export class PatientDentalhistoryTableComponent implements OnInit {
     }
   }
 
-  openAddEditModal(): void {
-    this.modalTitle = 'Add Dental History';
-    this.selectedDentalHistory = null;
-    this.isAddEditModalVisible = true;
-  }
 
   editDentalHistory(dentalHistory: DentalHistory): void {
+    this.isAddDentalHistoryModalVisible = true;
     this.modalTitle = 'Edit Dental History';
-
+  
     if (dentalHistory.id !== undefined) {
-      // ✅ Dispatch action to load dental history by ID
       this.store.dispatch(DentalHistoryActions.loadDentalHistoryById({ id: dentalHistory.id }));
-      this.isAddEditModalVisible = true;
+  
+      // ✅ Delay modal opening to ensure data is loaded
+      setTimeout(() => {
+        this.isAddEditModalVisible = true;
+        this.cdr.detectChanges(); // ✅ Force UI update
+      }, 100);
     } else {
       console.error('Cannot edit dental history: ID is undefined');
     }
   }
+  
 
   closeAddDentalHistoryModal(): void {
-    this.isAddEditModalVisible = false;
+    console.log('Closing modal'); // Debugging output
+    this.isAddDentalHistoryModalVisible = false;
+    this.selectedDentalHistory = null;  // ✅ Reset selected data
+    this.cdr.detectChanges(); // ✅ Force UI update
   }
 
   handleDentalHistorySubmit(dentalHistory: DentalHistory): void {
     console.log('Dental History Submitted:', dentalHistory); // Debugging output
   
     if (dentalHistory.id !== undefined) {
-      // ✅ Dispatch correctly by passing `id` and `dentalHistory`
       this.store.dispatch(DentalHistoryActions.updateDentalHistory({ 
         id: dentalHistory.id, 
-        dentalHistory: { 
-          patient_id: dentalHistory.patient_id,
-          previous_dentist: dentalHistory.previous_dentist, 
-          last_dentist_visit: dentalHistory.last_dentist_visit 
-        } // Only send updatable fields
+        dentalHistory 
       }));
+  
+      this.store.dispatch(DentalHistoryActions.loadDentalHistoriesByPatientId({ patientId: dentalHistory.patient_id }));
     } else {
       console.error('Error: Dental history ID is missing. Cannot update.');
     }
   
+    // ✅ Ensure modal is closed
     this.closeAddDentalHistoryModal();
   }
+  
   
 
   handleActionClick(event: { action: string; row: DentalHistory }): void {
     const { action, row } = event;
-
+  
     if (action === 'edit') {
-      this.editDentalHistory(row); // ✅ Call edit function
+      
+      this.editDentalHistory(row);
     } else if (action === 'delete') {
-      if (row.id !== undefined) {
-        this.deleteDentalHistory(row.id);
+      if (row.id !== undefined && row.patient_id !== undefined) {
+        // ✅ Store ID and Patient ID before showing modal
+        this.selectedDentalHistoryId = row.id;
+        this.selectedPatientId = row.patient_id;
+        this.isConfirmModalVisible = true; // ✅ Show modal
       } else {
-        console.error('Cannot delete dental history: ID is undefined');
+        console.error('Cannot delete dental history: ID or patient ID is undefined');
       }
     }
   }
 
+  confirmDelete(): void {
+    if (this.selectedDentalHistoryId !== null && this.selectedPatientId !== null) {
+      this.store.dispatch(DentalHistoryActions.deleteDentalHistory({ 
+        id: this.selectedDentalHistoryId
+      }));
+  
+      // ✅ Close modal
+      this.isConfirmModalVisible = false;
+      this.store.dispatch(DentalHistoryActions.loadDentalHistoriesByPatientId({patientId: this.selectedPatientId}))
+
+  
+      // ✅ Reset selected values
+      this.selectedDentalHistoryId = null;
+      this.selectedPatientId = null;
+    }
+  }
+  
+  
+
   deleteDentalHistory(id: number): void {
     this.store.dispatch(DentalHistoryActions.deleteDentalHistory({ id }));
+    this.route.paramMap.subscribe(params => {
+      const patientId = Number(params.get('patientId'));
+  
+      if (!isNaN(patientId) && patientId > 0) {
+        this.store.dispatch(DentalHistoryActions.loadDentalHistoriesByPatientId( {patientId: patientId} ));
+      } else {
+        console.error('Cannot delete dental history: Patient ID is missing in URL');
+      }
+    });
   }
 
   get searchTerm(): string {

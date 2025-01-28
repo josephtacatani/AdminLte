@@ -14,7 +14,6 @@
         (currentPageChange)="currentPage = $event"
         (sort)="sortDentalHistories($event)"
         (actionClick)="handleActionClick($event)"
-        (add)="openAddEditModal()"
       ></app-table-with-edit-delete>
     </ng-container>
 
@@ -32,10 +31,25 @@
 
 <!-- Add/Edit Dental History Modal -->
 <app-add-edit-dental-history
-  [isVisible]="isAddEditModalVisible"
+  [isVisible]="isAddDentalHistoryModalVisible"
   [title]="modalTitle"
   [dentalHistory]="selectedDentalHistory"
   (close)="closeAddDentalHistoryModal()"
   (submitModal)="handleDentalHistorySubmit($event)"  
 ></app-add-edit-dental-history>
 
+  <!-- ✅ Success Alert -->
+  <app-alert [message]="selectDentalMessage$ | async" type="success"></app-alert>
+
+  <!-- ❌ Error Alert -->
+  <app-alert [message]="errorMessage$ | async" type="danger"></app-alert>
+
+  <app-confirm-modal
+  [isVisible]="isConfirmModalVisible"
+  [title]="'Confirm Deletion'"
+  [message]="confirmModalMessage"
+  [confirmText]="'Delete'"
+  [cancelText]="'Cancel'"
+  (closeModal)="isConfirmModalVisible = false"
+  (confirmAction)="confirmDelete()"
+></app-confirm-modal>

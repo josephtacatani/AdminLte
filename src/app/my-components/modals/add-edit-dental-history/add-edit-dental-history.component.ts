@@ -15,7 +15,7 @@ export class AddEditDentalHistoryComponent implements OnChanges {
   @Input() isVisible: boolean = false;
   @Input() title: string = 'Add Dental History';
   @Input() dentalHistory: DentalHistory | null = null;
-  @Output() closeModal = new EventEmitter<void>();
+  @Output() close = new EventEmitter<void>();
   @Output() submitModal = new EventEmitter<DentalHistory>();
 
   dentalHistoryForm!: FormGroup;
@@ -48,13 +48,30 @@ export class AddEditDentalHistoryComponent implements OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['dentalHistory'] && this.dentalHistory) {
-      this.dentalHistoryForm.patchValue(this.dentalHistory);
+    if (changes['dentalHistory'] && changes['dentalHistory'].currentValue) {
+      const updated = changes['dentalHistory'].currentValue as DentalHistory;
+  
+      // If the date is something like "January 25, 2025", parse back to ISO:
+      if (updated.last_dentist_visit) {
+        const parsed = new Date(updated.last_dentist_visit);
+        // Turn into "YYYY-MM-DD"
+        const isoString = parsed.toISOString().substring(0, 10);
+  
+        this.dentalHistoryForm.patchValue({
+          ...updated,
+          last_dentist_visit: isoString,
+        });
+      } else {
+        this.dentalHistoryForm.patchValue(updated);
+      }
+      console.log("Form Updated with:", updated);
     }
   }
+  
+  
 
-  close(): void {
-    this.closeModal.emit();
+  closeModal(): void {
+    this.close.emit();
   }
 
 
@@ -73,7 +90,7 @@ export class AddEditDentalHistoryComponent implements OnChanges {
       this.submitModal.emit(dentalHistory);
 
       // Close modal
-      this.close();
+      this.closeModal();
     } else {
       alert('Please fill out all required fields.');
     }

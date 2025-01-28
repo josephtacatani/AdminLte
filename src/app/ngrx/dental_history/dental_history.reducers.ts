@@ -8,6 +8,7 @@ export interface DentalHistoryState {
   selectedDentalHistory: DentalHistory | null;
   loading: boolean;
   error: string | null;
+  messageDental: string | null;
 }
 
 export const initialDentalHistoryState: DentalHistoryState = {
@@ -16,6 +17,7 @@ export const initialDentalHistoryState: DentalHistoryState = {
   selectedDentalHistory: null,
   loading: false,
   error: null,
+  messageDental: null
 };
 
 export const dentalHistoryFeature = createFeature({
@@ -82,6 +84,7 @@ export const dentalHistoryFeature = createFeature({
     on(DentalHistoryActions.createDentalHistorySuccess, (state, { dentalHistory }) => ({
       ...state,
       dentalHistories: [...state.dentalHistories, dentalHistory.data as DentalHistory],
+      messageDental: dentalHistory.message,
       loading: false,
       error: null,
     })),
@@ -100,7 +103,8 @@ export const dentalHistoryFeature = createFeature({
         ...state,
         dentalHistories: dentalHistory.data
           ? state.dentalHistories.map(dh => (dh.id === dentalHistory.data!.id ? dentalHistory.data! : dh))
-          : state.dentalHistories, // Keep existing state if data is null
+          : state.dentalHistories, 
+          messageDental: dentalHistory.message,
         loading: false,
         error: null,
       })),
@@ -119,6 +123,7 @@ export const dentalHistoryFeature = createFeature({
     on(DentalHistoryActions.deleteDentalHistorySuccess, (state, { id }) => ({
       ...state,
       dentalHistories: state.dentalHistories.filter(dh => dh.id !== id),
+      messageDental: 'Dental History Successfully Deleted',
       loading: false,
       error: null,
     })),
@@ -126,7 +131,19 @@ export const dentalHistoryFeature = createFeature({
       ...state,
       loading: false,
       error,
-    }))
+    })),
+
+        // ✅ Clear Message
+        on(DentalHistoryActions.clearMessage, (state) => ({
+          ...state,
+          messageDental: null
+        })),
+    
+        // ✅ Clear Error
+        on(DentalHistoryActions.clearError, (state) => ({
+          ...state,
+          error: null
+        }))
   ),
 });
 
@@ -137,5 +154,6 @@ export const {
   selectSelectedDentalHistory,
   selectLoading,
   selectError,
-  selectSelectedDentalHistoriesByPatientId
+  selectSelectedDentalHistoriesByPatientId,
+  selectMessageDental
 } = dentalHistoryFeature;

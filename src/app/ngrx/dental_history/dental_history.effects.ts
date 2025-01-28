@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { catchError, map, mergeMap, of, tap } from 'rxjs';
+import { catchError, delay, map, mergeMap, of, tap } from 'rxjs';
 import { DentalHistoryActions } from './dental_history.actions';
 import { DentalHistoryService } from 'src/app/services/patients/patient-dental-history-service';
 import { Store } from '@ngrx/store';
@@ -58,23 +58,6 @@ export class DentalHistoryEffects {
     )
   );
 
-  loadDentalHistoriesAfterCreate$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(DentalHistoryActions.createDentalHistorySuccess),
-        tap(() => {
-          this.route.paramMap.subscribe(params => {
-            const patientId = Number(params.get('patientId'));
-            if (!isNaN(patientId) && patientId > 0) {
-              this.store.dispatch(DentalHistoryActions.loadDentalHistoriesByPatientId({ patientId }));
-            } else {
-              console.error('Invalid patient ID from route params.');
-            }
-          });
-        })
-      ),
-    { dispatch: false } // ✅ Prevents unnecessary action dispatching
-  );
   
 
   updateDentalHistory$ = createEffect(() =>
@@ -100,4 +83,25 @@ export class DentalHistoryEffects {
       )
     )
   );
+
+  
+    // ✅ Automatically clear success messages after 3 seconds
+    clearMessage$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(DentalHistoryActions.createDentalHistorySuccess, 
+          DentalHistoryActions.updateDentalHistorySuccess, 
+          DentalHistoryActions.deleteDentalHistorySuccess),
+        delay(3000), // ⏳ Wait 3 seconds
+        map(() => DentalHistoryActions.clearMessage())
+      )
+    );
+  
+    // ❌ Automatically clear error messages after 3 seconds
+    clearError$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(DentalHistoryActions.createDentalHistoryFailure, DentalHistoryActions.updateDentalHistoryFailure, DentalHistoryActions.deleteDentalHistoryFailure),
+        delay(3000), // ⏳ Wait 3 seconds
+        map(() => DentalHistoryActions.clearError())
+      )
+    );
 }

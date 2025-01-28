@@ -27,5 +27,9 @@ export const DentalHistoryActions = createActionGroup({
     'Delete Dental History': props<{ id: number }>(),
     'Delete Dental History Success': props<{ id: number }>(),
     'Delete Dental History Failure': props<{ error: string }>(),
+
+        // ✅ New actions to clear messages & errors
+        'Clear Message': emptyProps(),
+        'Clear Error': emptyProps(),
   }
 });

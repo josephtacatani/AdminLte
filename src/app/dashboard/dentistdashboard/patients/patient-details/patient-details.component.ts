@@ -86,6 +86,15 @@ export class PatientDetailsComponent implements OnInit {
     console.log('Dental History Submitted:', dentalHistory);
     this.store.dispatch(DentalHistoryActions.createDentalHistory({ dentalHistory }));
     this.closeAddDentalHistoryModal();
+    this.route.paramMap.subscribe(params => {
+      const patientId = Number(params.get('patientId'));
+  
+      if (!isNaN(patientId) && patientId > 0) {
+        this.store.dispatch(DentalHistoryActions.loadDentalHistoriesByPatientId( {patientId: patientId} ));
+      } else {
+        console.error('Cannot delete dental history: Patient ID is missing in URL');
+      }
+    });
   }
 
   handleMedicalHistorySubmit(medicalHistory: any): void {

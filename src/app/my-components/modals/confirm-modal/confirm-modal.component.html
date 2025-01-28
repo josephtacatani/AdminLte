@@ -11,9 +11,10 @@
         {{ message }}
         
         <!-- ✅ Countdown only shows if it's provided -->
-        <span *ngIf="countdown !== null">
+        <span *ngIf="countdown !== undefined && countdown !== null">
           <strong>{{ countdown }}s</strong> remaining before automatic logout.
         </span>
+        
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="close()">{{ cancelText }}</button>
