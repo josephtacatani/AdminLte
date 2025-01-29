@@ -18,31 +18,59 @@
   <div class="content">
     <div class="container-fluid">
       <div class="col-md-12">
-        <app-table
-          [title]="pagetitle + ' List'"
-          [data]="filteredSchedules"
-          [columns]="[
-            { key: 'date', label: 'Day', sortable: true },
-            { key: 'startTime', label: 'Start Time', sortable: true },
-            { key: 'endTime', label: 'End Time', sortable: true },
-            { key: 'duration', label: 'Duration', sortable: true }
-          ]"
-          [pageSizeOptions]="[5, 10, 15, 20]"
-          [(itemsPerPage)]="itemsPerPage"
-          [(currentPage)]="p"
-          [(searchTerm)]="searchTerm"
-          [showAddButton]="true"
-          [addButtonText]="'Add Schedule'"
-          (sort)="sortSchedules($event)"
-          (add)="openAddScheduleModal()"
-          (itemsPerPageChange)="onItemsPerPageChange($event)"
-          (currentPageChange)="p = $event"
-          (searchTermChange)="filterSchedules($event)"
-        ></app-table>
+        <div class="card">
+          <div class="card-header">
+            <button class="btn btn-primary" (click)="openAddScheduleModal()">
+              <i class="fas fa-plus"></i> Add Schedule
+            </button>
+          </div>
+          <div class="card-body">
+            <section>
+              <ng-container *ngIf="schedules$ | async as schedules; else loading">
+              <ng-container *ngIf="schedules.length > 0; else noData">
+                <app-table-with-edit-delete
+                [title]="pagetitle + ' List'"
+                [data]="(schedules$ | async) ?? []"
+                [columns]="columns"
+                [itemsPerPage]="itemsPerPage"
+                [(currentPage)]="p"
+                [searchTerm]="searchTerm"
+                (sort)="sortSchedules($event)"
+                (currentPageChange)="p = $event"
+                (searchTermChange)="filterSchedules($event)"
+                (actionClick)="handleActionClick($event)"
+              ></app-table-with-edit-delete>
+              </ng-container>
+          
+              <!-- ✅ Show this if there are no schedules -->
+              <ng-template #noData>
+                <p class="no-data-message">No schedules available.</p>
+              </ng-template>
+            </ng-container>
+          
+            <!-- ✅ Loading State -->
+            <ng-template #loading>
+              <p>Loading schedules...</p>
+            </ng-template>
+            </section>
+          </div>
+        </div>
+
+
       </div>
     </div>
   </div>
 </section>
+
+<!-- Show a loading spinner while fetching schedules -->
+<div *ngIf="isLoading$ | async" class="text-center">
+  <p>Loading schedules...</p>
+</div>
+
+<!-- Show an error message if fetching fails -->
+<div *ngIf="error$ | async as errorMessage" class="alert alert-danger">
+  <p>{{ errorMessage }}</p>
+</div>
 
 <app-general-modal
   [isVisible]="isAddScheduleModalVisible"

@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Schedule } from 'src/app/interfaces/patients.interface';
+import { Schedule } from 'src/app/interfaces/schedule.interface';
 
 @Component({
   selector: 'app-general-modal',
@@ -26,7 +26,6 @@ export class GeneralModalComponent {
       date: ['', Validators.required],
       startTime: ['', Validators.required],
       endTime: ['', Validators.required],
-      duration: ['', Validators.required],
     });
   }
 

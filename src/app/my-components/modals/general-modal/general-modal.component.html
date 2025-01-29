@@ -58,23 +58,6 @@
                 </div>
               </div>
             </div>
-            <div class="form-group">
-              <label for="appointmentDuration">Duration <span class="text-danger">*</span></label>
-              <select
-                class="form-control"
-                id="appointmentDuration"
-                formControlName="duration"
-              >
-                <option value="" disabled>Select Duration</option>
-                <option value="15">15 minutes</option>
-                <option value="30">30 minutes</option>
-                <option value="45">45 minutes</option>
-                <option value="60">1 hour</option>
-              </select>
-              <div *ngIf="scheduleForm.get('duration')?.invalid && scheduleForm.get('duration')?.touched" class="text-danger">
-                Duration is required.
-              </div>
-            </div>
           </form>
         </div>
         <div class="modal-footer">

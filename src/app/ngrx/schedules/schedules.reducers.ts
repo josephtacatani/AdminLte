@@ -5,21 +5,26 @@ import { Schedule, TimeSlot } from 'src/app/interfaces/schedule.interface';
 export interface ScheduleState {
   isLoading: boolean;
   schedules: Schedule[];
+  schedulesByDentistId: Schedule[];
   selectedSchedule: Schedule | null;
   selectedTimeSlot: TimeSlot | null;
   error: string | null;
+  message: string | null;
   deleteMessage: string | null;
   timeSlots: TimeSlot[];
   allTimeSlots: TimeSlot[]; // ✅ Added for all timeslots
   timeSlotsById: TimeSlot[];
+
 }
 
 export const initialScheduleState: ScheduleState = {
   isLoading: false,
   schedules: [],
   selectedSchedule: null,
+  schedulesByDentistId: [],
   selectedTimeSlot: null,
   error: null,
+  message: null,
   deleteMessage: null,
   timeSlots: [],
   allTimeSlots: [],// ✅ Added for all timeslots
@@ -59,7 +64,7 @@ export const scheduleFeature = createFeature({
     on(ScheduleActions.loadSchedulesByDentistSuccess, (state, { schedulesResponse }) => ({
       ...state,
       isLoading: false,
-      schedules: schedulesResponse.data, // ✅ Only schedules for the selected dentist
+      schedulesByDentistId: schedulesResponse.data, // ✅ Only schedules for the selected dentist
       error: null,
     })),
     on(ScheduleActions.loadSchedulesByDentistFailure, (state, { error }) => ({
@@ -98,6 +103,7 @@ export const scheduleFeature = createFeature({
       ...state,
       isLoading: false,
       schedules: [...state.schedules, createdSchedule.data],
+      message: createdSchedule.message,
       error: null,
     })),
     on(ScheduleActions.createScheduleFailure, (state, { error }) => ({
@@ -117,7 +123,7 @@ export const scheduleFeature = createFeature({
       isLoading: false,
       schedules: state.schedules.filter(schedule => schedule.id !== state.selectedSchedule?.id),
       selectedSchedule: null,
-      deleteMessage: message,
+      message: message,
       error: null,
     })),
     on(ScheduleActions.deleteScheduleFailure, (state, { error }) => ({
@@ -214,5 +220,7 @@ export const {
   selectTimeSlots,
   selectAllTimeSlots,
   selectTimeSlotsById,
-  selectSelectedTimeSlot
+  selectSelectedTimeSlot,
+  selectSchedulesByDentistId,
+  selectMessage
 } = scheduleFeature;

@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./table-with-edit-delete.component.scss']
 })
 export class TableWithEditDeleteComponent {
-  @Input() title: string = 'Table';
+    @Input() title: string = 'Table';
     @Input() data: any[] = []; // Table data
     @Input() columns: { key: string; label: string; sortable?: boolean }[] = []; // Column definitions
     @Input() itemsPerPage: number = 10;
