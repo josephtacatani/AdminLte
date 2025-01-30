@@ -39,7 +39,7 @@
                   type="time"
                   class="form-control"
                   id="appointmentStartTime"
-                  formControlName="startTime"
+                  formControlName="start_time"
                 />
                 <div *ngIf="scheduleForm.get('startTime')?.invalid && scheduleForm.get('startTime')?.touched" class="text-danger">
                   Start time is required.
@@ -51,7 +51,7 @@
                   type="time"
                   class="form-control"
                   id="appointmentEndTime"
-                  formControlName="endTime"
+                  formControlName="end_time"
                 />
                 <div *ngIf="scheduleForm.get('endTime')?.invalid && scheduleForm.get('endTime')?.touched" class="text-danger">
                   End time is required.

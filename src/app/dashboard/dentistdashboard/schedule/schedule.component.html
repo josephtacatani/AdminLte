@@ -26,55 +26,67 @@
           </div>
           <div class="card-body">
             <section>
-              <ng-container *ngIf="schedules$ | async as schedules; else loading">
-              <ng-container *ngIf="schedules.length > 0; else noData">
-                <app-table-with-edit-delete
-                [title]="pagetitle + ' List'"
-                [data]="(schedules$ | async) ?? []"
-                [columns]="columns"
-                [itemsPerPage]="itemsPerPage"
-                [(currentPage)]="p"
-                [searchTerm]="searchTerm"
-                (sort)="sortSchedules($event)"
-                (currentPageChange)="p = $event"
-                (searchTermChange)="filterSchedules($event)"
-                (actionClick)="handleActionClick($event)"
-              ></app-table-with-edit-delete>
+              <ng-container *ngIf="filteredSchedules$ | async as schedules; else loading">
+                <ng-container *ngIf="schedules.length > 0; else noData">
+                  <app-table-with-edit-delete
+                    [title]="pagetitle + ' List'"
+                    [data]="schedules || []"
+                    [columns]="columns"
+                    [itemsPerPage]="itemsPerPage"
+                    [(currentPage)]="currentPage"
+                    [searchTerm]="searchTerm"
+                    (sort)="sortSchedules($event)"
+                    (currentPageChange)="currentPage = $event"
+                    (searchTermChange)="filterSchedules($event)"
+                    (actionClick)="handleActionClick($event)"
+                  ></app-table-with-edit-delete>
+                </ng-container>
+
+                <ng-template #noData>
+                  <p class="no-data-message">No schedules available.</p>
+                </ng-template>
               </ng-container>
-          
-              <!-- ✅ Show this if there are no schedules -->
-              <ng-template #noData>
-                <p class="no-data-message">No schedules available.</p>
+
+              <ng-template #loading>
+                <p>Loading schedules...</p>
               </ng-template>
-            </ng-container>
-          
-            <!-- ✅ Loading State -->
-            <ng-template #loading>
-              <p>Loading schedules...</p>
-            </ng-template>
             </section>
           </div>
         </div>
-
-
       </div>
     </div>
   </div>
 </section>
 
-<!-- Show a loading spinner while fetching schedules -->
+<!-- Loading Spinner -->
 <div *ngIf="isLoading$ | async" class="text-center">
   <p>Loading schedules...</p>
 </div>
 
-<!-- Show an error message if fetching fails -->
-<div *ngIf="error$ | async as errorMessage" class="alert alert-danger">
-  <p>{{ errorMessage }}</p>
+<!-- Error Message -->
+<div *ngIf="errorMessage$ | async as error" class="alert alert-danger">
+  <p>{{ error }}</p>
 </div>
 
+<!-- Success Message -->
+<app-alert *ngIf="message$ | async as message" [message]="message" type="success"></app-alert>
+
+<!-- Add/Edit Schedule Modal -->
 <app-general-modal
   [isVisible]="isAddScheduleModalVisible"
-  [title]="'Add Schedule'"
+  [title]="title"
+  [scheduleData]="selectedSchedule"
   (closeModal)="closeAddScheduleModal()"
   (submitModal)="handleAddSchedule($event)"
 ></app-general-modal>
+
+<!-- Confirm Delete Modal -->
+<app-confirm-modal
+  [isVisible]="isConfirmModalVisible"
+  [title]="'Confirm Deletion'"
+  [message]="confirmModalMessage"
+  [confirmText]="'Delete'"
+  [cancelText]="'Cancel'"
+  (closeModal)="isConfirmModalVisible = false"
+  (confirmAction)="deleteSchedule()"
+></app-confirm-modal>

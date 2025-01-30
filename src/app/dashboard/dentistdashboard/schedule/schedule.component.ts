@@ -1,47 +1,45 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { NgxPaginationModule } from 'ngx-pagination';
-import { GeneralModalComponent } from 'src/app/my-components/modals/general-modal/general-modal.component';
-import { TableComponent } from 'src/app/my-components/tables/table/table.component';
-import { Store, select } from '@ngrx/store';
-import { map, Observable } from 'rxjs';
-import { selectError, selectIsLoading, selectMessage, selectSchedules, selectSchedulesByDentistId, selectSelectedSchedule } from 'src/app/ngrx/schedules/schedules.reducers';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { CommonModule, formatDate } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { select, Store } from '@ngrx/store';
 import { Schedule } from 'src/app/interfaces/schedule.interface';
+import { selectSchedulesByDentistId, selectSelectedSchedule, selectError, selectIsLoading, selectMessage } from 'src/app/ngrx/schedules/schedules.reducers';
 import { ScheduleActions } from 'src/app/ngrx/schedules/schedule.actions';
-import { EditDeleteTableComponent } from 'src/app/my-components/tables/edit_delete_tables/edit_delete_table';
-import { TableWithEditDeleteComponent } from "../../../my-components/tables/table-with-edit-delete/table-with-edit-delete.component";
-
+import { TableWithEditDeleteComponent } from 'src/app/my-components/tables/table-with-edit-delete/table-with-edit-delete.component';
+import { AlertComponent } from 'src/app/my-components/alert/alert.component';
+import { ConfirmModalComponent } from 'src/app/my-components/modals/confirm-modal/confirm-modal.component';
+import { GeneralModalComponent } from 'src/app/my-components/modals/general-modal/general-modal.component';
+import { decodeAccessToken } from 'src/app/services/auth/auth.utils';
 
 @Component({
-  selector: 'app-schedule',
+  selector: 'app-schedule-table',
   standalone: true,
-  imports: [CommonModule, GeneralModalComponent, NgxPaginationModule, TableWithEditDeleteComponent],
+  imports: [CommonModule, TableWithEditDeleteComponent, AlertComponent, ConfirmModalComponent, GeneralModalComponent],
   templateUrl: './schedule.component.html',
   styleUrls: ['./schedule.component.scss'],
 })
 export class ScheduleComponent implements OnInit {
   pagetitle = 'Schedule';
-  isAddScheduleModalVisible: boolean = false;
-  itemsPerPage: number = 10;
-  p: number = 1; // Current page number
-  searchTerm: string = '';
-  sortColumn: string = 'date';
-  sortDirection: string = 'asc';
-  selectSelectedScheduleById: number | null = null;
-  modalTitle = '';
-
+  isAddScheduleModalVisible = false;
+  isConfirmModalVisible = false;
+  confirmModalMessage = 'Are you sure you want to delete this schedule?';
+  isLoading$: Observable<boolean> = this.store.pipe(select(selectIsLoading));
+  errorMessage$: Observable<string | null> = this.store.pipe(select(selectError));
   message$: Observable<string | null> = this.store.pipe(select(selectMessage));
-  error$: Observable<string | null> = this.store.pipe(select(selectError));
-  schedules$: Observable<Schedule[] | null> = this.store.pipe(select(selectSchedulesByDentistId),
-  map(schedules => schedules || []));
+  schedules$: Observable<Schedule[]> = this.store.pipe(select(selectSchedulesByDentistId));
+  selectedSchedule$: Observable<Schedule | null> = this.store.pipe(select(selectSelectedSchedule));
+  selectedSchedule: Schedule | null = null;
+  dentistId: number | null = null;
+  title: string= '';
 
-  scheduleById$: Observable<Schedule | null> = this.store.pipe(select(selectSelectedSchedule),
-  map(scheduleById => scheduleById || ({} as Schedule)));
+  private searchTermSubject = new BehaviorSubject<string>('');
+  searchTerm$ = this.searchTermSubject.asObservable();
 
-  isLoading$: Observable<boolean | null> = this.store.pipe(select(selectIsLoading));
-  constructor(private store: Store) {
+  private sortColumnSubject = new BehaviorSubject<string>('date');
+  private sortDirectionSubject = new BehaviorSubject<'asc' | 'desc'>('asc');
 
-  }
+  filteredSchedules$: Observable<Schedule[]>;
 
   columns = [
     { key: 'date', label: 'Date', sortable: true },
@@ -50,87 +48,129 @@ export class ScheduleComponent implements OnInit {
     { key: 'action', label: 'Action', sortable: false },
   ];
 
-  ngOnInit(): void {
-    this.store.dispatch(ScheduleActions.loadSchedulesByDentist({dentistId: 39}))
+  itemsPerPage = 10;
+  currentPage = 1;
+
+  constructor(private route: ActivatedRoute, private store: Store, private cdr: ChangeDetectorRef) {
+    this.filteredSchedules$ = combineLatest([
+      this.schedules$,
+      this.searchTerm$,
+      this.sortColumnSubject,
+      this.sortDirectionSubject,
+    ]).pipe(
+      map(([schedules, searchTerm, sortColumn, sortDirection]) => {
+        let filtered = schedules.map((schedule) => ({
+          ...schedule,
+          date: formatDate(schedule.date, 'MMMM d, y', 'en-US'), // Format date
+        }));
+
+        if (searchTerm.trim()) {
+          filtered = filtered.filter((schedule) =>
+            Object.values(schedule)
+              .join(' ')
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase())
+          );
+        }
+
+        return [...filtered].sort((a, b) => {
+          let aValue = a[sortColumn as keyof Schedule] as string;
+          let bValue = b[sortColumn as keyof Schedule] as string;
+          return sortDirection === 'asc' ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        });
+      })
+    );
+
+    this.selectedSchedule$.subscribe(schedule => {
+      this.selectedSchedule = schedule; // Store in local variable
+    });
   }
-  
 
-
-  openAddScheduleModal(): void {
-    this.isAddScheduleModalVisible = true;
-    this.modalTitle = 'Add Schedule';
-    this.scheduleById$ = this.store.pipe(map(() => null)); // Reset form
-  }
-
-  closeAddScheduleModal(): void {
-    this.isAddScheduleModalVisible = false;
-  }
-
-  handleAddSchedule(schedule: Schedule): void {
-    if (this.modalTitle === 'Edit Schedule' && schedule.id) {
-      this.store.dispatch(ScheduleActions.updateSchedule({ schedule_id: schedule.id, updateSchedule: {...schedule}  }));
+  ngOnInit(): void {    const userData = decodeAccessToken();
+    if (userData?.id) {
+      this.dentistId = userData.id
+      this.store.dispatch(ScheduleActions.loadSchedulesByDentist({dentistId: this.dentistId}))
     } else {
-      this.store.dispatch(ScheduleActions.createSchedule({ createSchedule: schedule }));
+      console.warn('No user ID found in token!');
     }
-    
-    this.closeAddScheduleModal();
-  }
-
-  sortSchedules(column: string): void {
-    this.sortColumn = column;
-    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-  
   }
 
   filterSchedules(search: string): void {
-    this.searchTerm = search;
-
+    this.searchTermSubject.next(search.trim());
   }
 
-  onItemsPerPageChange(items: number): void {
-    this.itemsPerPage = items;
-  }
-
-  onSearch(event: Event): void {
-    const search = (event.target as HTMLInputElement).value;
-    this.filterSchedules(search);
-  }
-
-    handleActionClick(event: { action: string; row: Schedule }): void {
-      const { action, row } = event;
-    
-      if (action === 'edit') {
-        
-        this.editSchedule(row);
-      } else if (action === 'delete') {
-        if (row.id !== undefined ) {
-          // ✅ Store ID and Patient ID before showing modal
-          this.selectSelectedScheduleById = row.id;
-          this.isAddScheduleModalVisible = true; // ✅ Show modal
-        } else {
-          console.error('Cannot delete dental history: ID or patient ID is undefined');
-        }
-      }
+  sortSchedules(column: string): void {
+    if (this.sortColumnSubject.getValue() === column) {
+      this.sortDirectionSubject.next(this.sortDirectionSubject.getValue() === 'asc' ? 'desc' : 'asc');
+    } else {
+      this.sortColumnSubject.next(column);
+      this.sortDirectionSubject.next('asc');
     }
+  }
 
-    editSchedule(schedule: Schedule): void {
-      this.modalTitle = 'Edit Schedule';
-      this.isAddScheduleModalVisible = true;
-    
-      if (schedule.id !== undefined) {
-        this.store.dispatch(ScheduleActions.loadScheduleById({ schedule_id: schedule.id }));
-    
-        // ✅ Ensure the modal opens with prefilled data
-        this.scheduleById$ = this.store.pipe(
-          select(selectSelectedSchedule),
-          map(selected => selected ?? ({} as Schedule))
-        );
+  handleActionClick(event: { action: string; row: Schedule }): void {
+    const { action, row } = event;
+
+    if (action === 'edit') {
+      this.editSchedule(row);
+    } else if (action === 'delete') {
+      this.selectedSchedule = row;
+      this.isConfirmModalVisible = true;
+    }
+  }
+
+  editSchedule(schedule: Schedule): void {
+    this.title = 'Edit Schedule';
+    this.selectedSchedule = schedule; // Ensure the selected schedule is passed to the modal
+    this.isAddScheduleModalVisible = true;
+    this.store.dispatch(ScheduleActions.loadScheduleById({ schedule_id: schedule.id }));
+  }
+  
+
+  closeAddScheduleModal(): void {
+    this.isAddScheduleModalVisible = false;
+    this.selectedSchedule = null;
+    this.cdr.detectChanges();
+  }
+
+  handleAddSchedule(schedule: Schedule): void {
+    if (this.title === 'Edit Schedule' && schedule.id) {
+      // This is an edit, so we update the schedule
+      this.store.dispatch(ScheduleActions.updateSchedule({ schedule_id: schedule.id, updateSchedule: { ...schedule } }));
+    } else {
+      // This is a create, so we create the schedule
+      if (this.dentistId !== null && this.dentistId !== undefined) {
+        this.store.dispatch(ScheduleActions.createSchedule({
+          createSchedule: {
+            dentist_id: this.dentistId,
+            date: schedule.date,
+            start_time: schedule.start_time,
+            end_time: schedule.end_time,
+          }
+        }));
       } else {
-        console.error('Cannot edit schedule: ID is undefined');
+        console.error('Incorrect dentist id');
       }
     }
+  
+    // Close modal after the action
+    this.closeAddScheduleModal();
+  }
+  
 
-    deleteSchedule(schedule: Schedule): void {
-        this.store.dispatch(ScheduleActions.deleteSchedule({ id: schedule.id }));
+  deleteSchedule(): void {
+    if (this.selectedSchedule?.id) {
+      this.store.dispatch(ScheduleActions.deleteSchedule({ id: this.selectedSchedule.id }));
+      this.isConfirmModalVisible = false;
+      this.store.dispatch(ScheduleActions.loadSchedulesByDentist({ dentistId: this.selectedSchedule.dentist_id }));
     }
+  }
+
+  openAddScheduleModal(){
+    this.title = 'Add Schedule'; 
+    this.isAddScheduleModalVisible = true;
+  }
+  get searchTerm(): string {
+    return this.searchTermSubject.getValue();
+  }
 }

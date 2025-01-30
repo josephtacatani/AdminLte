@@ -228,6 +228,18 @@ on(ScheduleActions.loadTimeByTimeslotIdFailure, (state, { error }) => ({
   error,
 })),
 
+        // ✅ Clear Message
+        on(ScheduleActions.clearMessage, (state) => ({
+          ...state,
+          messageDental: null
+        })),
+    
+        // ✅ Clear Error
+        on(ScheduleActions.clearError, (state) => ({
+          ...state,
+          error: null
+        }))
+
     
 
   ),

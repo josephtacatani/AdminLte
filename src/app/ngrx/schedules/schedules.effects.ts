@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createEffect, Actions, ofType } from '@ngrx/effects';
 import { ScheduleActions } from './schedule.actions';
-import { catchError, map, mergeMap, of } from 'rxjs';
+import { catchError, delay, map, mergeMap, of } from 'rxjs';
 import { SchedulesService } from 'src/app/services/schedules/schedule.service';
 
 @Injectable()
@@ -170,6 +170,26 @@ export class ScheduleEffects {
         )
       )
     );
+
+        // ✅ Automatically clear success messages after 3 seconds
+        clearMessage$ = createEffect(() =>
+          this.actions$.pipe(
+            ofType(ScheduleActions.createSchedule, 
+              ScheduleActions.updateSchedule, 
+              ScheduleActions.deleteSchedule),
+            delay(3000), // ⏳ Wait 3 seconds
+            map(() => ScheduleActions.clearMessage())
+          )
+        );
+      
+        // ❌ Automatically clear error messages after 3 seconds
+        clearError$ = createEffect(() =>
+          this.actions$.pipe(
+            ofType(ScheduleActions.createScheduleFailure, ScheduleActions.deleteScheduleFailure, ScheduleActions.updateScheduleFailure),
+            delay(3000), // ⏳ Wait 3 seconds
+            map(() => ScheduleActions.clearError())
+          )
+        );
 
     
   

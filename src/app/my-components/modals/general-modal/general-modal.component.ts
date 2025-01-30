@@ -13,6 +13,7 @@ import { Schedule } from 'src/app/interfaces/schedule.interface';
 export class GeneralModalComponent {
   @Input() isVisible: boolean = false;
   @Input() title: string = 'Add Schedule';
+  @Input() scheduleData: Schedule | null = null;
   @Output() closeModal = new EventEmitter<void>();
   @Output() submitModal = new EventEmitter<Schedule>();
 
@@ -24,8 +25,8 @@ export class GeneralModalComponent {
     // Initialize the form
     this.scheduleForm = this.fb.group({
       date: ['', Validators.required],
-      startTime: ['', Validators.required],
-      endTime: ['', Validators.required],
+      start_time: ['', Validators.required],
+      end_time: ['', Validators.required],
     });
   }
 
