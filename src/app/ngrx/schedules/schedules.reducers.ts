@@ -131,6 +131,30 @@ export const scheduleFeature = createFeature({
       isLoading: false,
       error,
     })),
+
+        // ✅ Update a schedule
+        on(ScheduleActions.updateSchedule, (state) => ({
+          ...state,
+          isLoading: true,
+          error: null,
+        })),
+        on(ScheduleActions.updateScheduleSuccess, (state, { updatedSchedule }) => ({
+          ...state,
+          isLoading: false,
+          schedules: state.schedules.filter(schedule => 
+            schedule.id === updatedSchedule.data.id ? updatedSchedule.data: schedule
+          ),
+          selectedSchedule: updatedSchedule.data,
+          message: updatedSchedule.message,
+          error: null,
+        })),
+        on(ScheduleActions.updateScheduleFailure, (state, { error }) => ({
+          ...state,
+          isLoading: false,
+          error,
+        })),
+
+
     // ✅ Load available time slots
     on(ScheduleActions.loadTimeSlots, (state) => ({
       ...state,

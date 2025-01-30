@@ -37,6 +37,10 @@ export class SchedulesService {
   deleteSchedule(id: number): Observable<{message: string}> {
     return this.http.delete<{message: string}>(`${this.apiUrl}/${id}`);
   }
+  
+  updateSchedule(id: number, updateSchedule: Partial<Schedule>): Observable<ScheduleResponse>{
+    return this.http.put<ScheduleResponse>(`${this.apiUrl}/${id}`, updateSchedule);
+  }
 
   getTimeSlots(scheduleId: number): Observable<TimeSlotsResponse> {
     return this.http.get<TimeSlotsResponse>(`${this.timeSlotsUrl}/${scheduleId}`);

@@ -89,6 +89,22 @@ export class ScheduleEffects {
     )
   );
 
+  updateSchedule$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(ScheduleActions.updateSchedule),
+      mergeMap(({ schedule_id, updateSchedule }) =>
+        this.scheduleService.updateSchedule(schedule_id, updateSchedule).pipe(
+          map((updatedSchedule) =>
+            ScheduleActions.updateScheduleSuccess({ updatedSchedule }) // ✅ Extract only `message`
+          ),
+          catchError((error) =>
+            of(ScheduleActions.updateScheduleFailure({ error: error.message }))
+          )
+        )
+      )
+    )
+  );
+
   // ✅ Load available time slots when schedule is selected
   loadTimeSlots$ = createEffect(() =>
     this.actions$.pipe(

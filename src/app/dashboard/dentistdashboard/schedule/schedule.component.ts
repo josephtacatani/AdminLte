@@ -68,7 +68,7 @@ export class ScheduleComponent implements OnInit {
 
   handleAddSchedule(schedule: Schedule): void {
     if (this.modalTitle === 'Edit Schedule' && schedule.id) {
-      // this.store.dispatch(ScheduleActions.updateSchedule({ schedule }));
+      this.store.dispatch(ScheduleActions.updateSchedule({ schedule_id: schedule.id, updateSchedule: {...schedule}  }));
     } else {
       this.store.dispatch(ScheduleActions.createSchedule({ createSchedule: schedule }));
     }

@@ -22,6 +22,10 @@ export const ScheduleActions = createActionGroup({
     'Create Schedule Success': props<{ createdSchedule: ScheduleResponse }>(),
     'Create Schedule Failure': props<{ error: string }>(),
 
+    'Update Schedule': props<{ schedule_id: number, updateSchedule: Partial<Schedule> }>(),
+    'Update Schedule Success': props<{ updatedSchedule: ScheduleResponse }>(),
+    'Update Schedule Failure': props<{ error: string }>(),
+
     'Delete Schedule': props<{ id: number }>(),
     'Delete Schedule Success': props<{ message: string}>(),
     'Delete Schedule Failure': props<{ error: string }>(),
