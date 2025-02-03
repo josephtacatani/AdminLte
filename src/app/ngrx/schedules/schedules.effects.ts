@@ -174,9 +174,12 @@ export class ScheduleEffects {
         // ✅ Automatically clear success messages after 3 seconds
         clearMessage$ = createEffect(() =>
           this.actions$.pipe(
-            ofType(ScheduleActions.createSchedule, 
-              ScheduleActions.updateSchedule, 
-              ScheduleActions.deleteSchedule),
+            ofType(
+              ScheduleActions.createScheduleSuccess,
+              ScheduleActions.updateScheduleSuccess,
+              ScheduleActions.deleteScheduleSuccess,
+              
+            ),
             delay(3000), // ⏳ Wait 3 seconds
             map(() => ScheduleActions.clearMessage())
           )

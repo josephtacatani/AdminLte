@@ -46,9 +46,9 @@ export const ScheduleActions = createActionGroup({
     'Load Time by Timeslot Id Success': props<{ timeSlotsResponse: TimeslotIdResponse }>(),
     'Load Time by Timeslot Id Failure': props<{ error: string }>(),
 
-            // ✅ New actions to clear messages & errors
-            'Clear Message': emptyProps(),
-            'Clear Error': emptyProps(),
+    // ✅ New actions to clear messages & errors
+    'Clear Message': emptyProps(),
+    'Clear Error': emptyProps(),
 
 
   }

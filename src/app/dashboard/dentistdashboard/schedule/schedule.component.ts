@@ -1,10 +1,15 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule, formatDate } from '@angular/common';
-import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, combineLatest, map, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { Schedule } from 'src/app/interfaces/schedule.interface';
-import { selectSchedulesByDentistId, selectSelectedSchedule, selectError, selectIsLoading, selectMessage } from 'src/app/ngrx/schedules/schedules.reducers';
+import { 
+  selectSchedulesByDentistId, 
+  selectSelectedSchedule, 
+  selectError, 
+  selectIsLoading, 
+  selectMessage 
+} from 'src/app/ngrx/schedules/schedules.reducers';
 import { ScheduleActions } from 'src/app/ngrx/schedules/schedule.actions';
 import { TableWithEditDeleteComponent } from 'src/app/my-components/tables/table-with-edit-delete/table-with-edit-delete.component';
 import { AlertComponent } from 'src/app/my-components/alert/alert.component';
@@ -22,20 +27,21 @@ import { decodeAccessToken } from 'src/app/services/auth/auth.utils';
 export class ScheduleComponent implements OnInit {
   pagetitle = 'Schedule';
   isAddScheduleModalVisible = false;
+  isEditScheduleModalVisible = false;
   isConfirmModalVisible = false;
   confirmModalMessage = 'Are you sure you want to delete this schedule?';
+  
   isLoading$: Observable<boolean> = this.store.pipe(select(selectIsLoading));
   errorMessage$: Observable<string | null> = this.store.pipe(select(selectError));
   message$: Observable<string | null> = this.store.pipe(select(selectMessage));
   schedules$: Observable<Schedule[]> = this.store.pipe(select(selectSchedulesByDentistId));
   selectedSchedule$: Observable<Schedule | null> = this.store.pipe(select(selectSelectedSchedule));
+
   selectedSchedule: Schedule | null = null;
   dentistId: number | null = null;
-  title: string= '';
 
   private searchTermSubject = new BehaviorSubject<string>('');
   searchTerm$ = this.searchTermSubject.asObservable();
-
   private sortColumnSubject = new BehaviorSubject<string>('date');
   private sortDirectionSubject = new BehaviorSubject<'asc' | 'desc'>('asc');
 
@@ -51,7 +57,7 @@ export class ScheduleComponent implements OnInit {
   itemsPerPage = 10;
   currentPage = 1;
 
-  constructor(private route: ActivatedRoute, private store: Store, private cdr: ChangeDetectorRef) {
+  constructor(private store: Store, private cdr: ChangeDetectorRef) {
     this.filteredSchedules$ = combineLatest([
       this.schedules$,
       this.searchTerm$,
@@ -61,7 +67,7 @@ export class ScheduleComponent implements OnInit {
       map(([schedules, searchTerm, sortColumn, sortDirection]) => {
         let filtered = schedules.map((schedule) => ({
           ...schedule,
-          date: formatDate(schedule.date, 'MMMM d, y', 'en-US'), // Format date
+          date: formatDate(schedule.date, 'MMMM d, y', 'en-US'),
         }));
 
         if (searchTerm.trim()) {
@@ -81,17 +87,21 @@ export class ScheduleComponent implements OnInit {
       })
     );
 
-    this.selectedSchedule$.subscribe(schedule => {
-      this.selectedSchedule = schedule; // Store in local variable
+    this.store.pipe(
+      select(selectMessage),
+      filter(message => !!message)
+    ).subscribe(() => {
+      if (this.dentistId) {
+        this.store.dispatch(ScheduleActions.loadSchedulesByDentist({ dentistId: this.dentistId }));
+      }
     });
   }
 
-  ngOnInit(): void {    const userData = decodeAccessToken();
+  ngOnInit(): void {
+    const userData = decodeAccessToken();
     if (userData?.id) {
-      this.dentistId = userData.id
-      this.store.dispatch(ScheduleActions.loadSchedulesByDentist({dentistId: this.dentistId}))
-    } else {
-      console.warn('No user ID found in token!');
+      this.dentistId = userData.id;
+      this.store.dispatch(ScheduleActions.loadSchedulesByDentist({ dentistId: this.dentistId }));
     }
   }
 
@@ -112,64 +122,72 @@ export class ScheduleComponent implements OnInit {
     const { action, row } = event;
 
     if (action === 'edit') {
-      this.editSchedule(row);
+      this.openEditScheduleModal(row);
     } else if (action === 'delete') {
       this.selectedSchedule = row;
       this.isConfirmModalVisible = true;
     }
   }
 
-  editSchedule(schedule: Schedule): void {
-    this.title = 'Edit Schedule';
-    this.selectedSchedule = schedule; // Ensure the selected schedule is passed to the modal
-    this.isAddScheduleModalVisible = true;
-    this.store.dispatch(ScheduleActions.loadScheduleById({ schedule_id: schedule.id }));
-  }
-  
-
-  closeAddScheduleModal(): void {
-    this.isAddScheduleModalVisible = false;
+  // ✅ Add Schedule
+  openAddScheduleModal(): void {
     this.selectedSchedule = null;
-    this.cdr.detectChanges();
+    this.isAddScheduleModalVisible = true;
   }
 
   handleAddSchedule(schedule: Schedule): void {
-    if (this.title === 'Edit Schedule' && schedule.id) {
-      // This is an edit, so we update the schedule
-      this.store.dispatch(ScheduleActions.updateSchedule({ schedule_id: schedule.id, updateSchedule: { ...schedule } }));
-    } else {
-      // This is a create, so we create the schedule
-      if (this.dentistId !== null && this.dentistId !== undefined) {
-        this.store.dispatch(ScheduleActions.createSchedule({
-          createSchedule: {
-            dentist_id: this.dentistId,
-            date: schedule.date,
-            start_time: schedule.start_time,
-            end_time: schedule.end_time,
-          }
-        }));
-      } else {
-        console.error('Incorrect dentist id');
-      }
+    if (this.dentistId) {
+      this.store.dispatch(ScheduleActions.createSchedule({
+        createSchedule: {
+          dentist_id: this.dentistId,
+          date: schedule.date,
+          start_time: schedule.start_time,
+          end_time: schedule.end_time,
+        }
+      }));
     }
-  
-    // Close modal after the action
-    this.closeAddScheduleModal();
+    this.closeScheduleModal();
   }
-  
 
+  // ✅ Edit Schedule
+  openEditScheduleModal(schedule: Schedule): void {
+    this.isEditScheduleModalVisible = true;
+    this.store.dispatch(ScheduleActions.loadScheduleById({ schedule_id: schedule.id }));
+
+    this.selectedSchedule$ = this.store.pipe(select(selectSelectedSchedule));
+    this.selectedSchedule$.subscribe((loadedSchedule) => {
+      if (loadedSchedule) {
+        this.selectedSchedule = loadedSchedule;
+      }
+    });
+  }
+
+  handleEditSchedule(schedule: Schedule): void {
+    if (schedule.id) {
+      this.store.dispatch(ScheduleActions.updateSchedule({ 
+        schedule_id: schedule.id, 
+        updateSchedule: { ...schedule } 
+      }));
+    }
+    this.closeScheduleModal();
+  }
+
+  // ✅ Delete Schedule
   deleteSchedule(): void {
     if (this.selectedSchedule?.id) {
       this.store.dispatch(ScheduleActions.deleteSchedule({ id: this.selectedSchedule.id }));
       this.isConfirmModalVisible = false;
-      this.store.dispatch(ScheduleActions.loadSchedulesByDentist({ dentistId: this.selectedSchedule.dentist_id }));
     }
   }
 
-  openAddScheduleModal(){
-    this.title = 'Add Schedule'; 
-    this.isAddScheduleModalVisible = true;
+  // ✅ Modal Management
+  closeScheduleModal(): void {
+    this.isAddScheduleModalVisible = false;
+    this.isEditScheduleModalVisible = false;
+    this.selectedSchedule = null;
+    this.cdr.detectChanges();
   }
+
   get searchTerm(): string {
     return this.searchTermSubject.getValue();
   }

@@ -231,7 +231,7 @@ on(ScheduleActions.loadTimeByTimeslotIdFailure, (state, { error }) => ({
         // ✅ Clear Message
         on(ScheduleActions.clearMessage, (state) => ({
           ...state,
-          messageDental: null
+          message: null
         })),
     
         // ✅ Clear Error
@@ -258,5 +258,5 @@ export const {
   selectTimeSlotsById,
   selectSelectedTimeSlot,
   selectSchedulesByDentistId,
-  selectMessage
+  selectMessage,
 } = scheduleFeature;

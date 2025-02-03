@@ -73,12 +73,13 @@
 
 <!-- Add/Edit Schedule Modal -->
 <app-general-modal
-  [isVisible]="isAddScheduleModalVisible"
-  [title]="title"
-  [scheduleData]="selectedSchedule"
-  (closeModal)="closeAddScheduleModal()"
-  (submitModal)="handleAddSchedule($event)"
+  [isVisible]="isAddScheduleModalVisible || isEditScheduleModalVisible"
+  [title]="isEditScheduleModalVisible ? 'Edit Schedule' : 'Add Schedule'"
+  [scheduleData]="isEditScheduleModalVisible ? selectedSchedule : null"
+  (closeModal)="closeScheduleModal()"
+  (submitModal)="isEditScheduleModalVisible ? handleEditSchedule($event) : handleAddSchedule($event)"
 ></app-general-modal>
+
 
 <!-- Confirm Delete Modal -->
 <app-confirm-modal
