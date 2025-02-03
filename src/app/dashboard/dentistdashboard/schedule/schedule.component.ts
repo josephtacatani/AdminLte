@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule, formatDate } from '@angular/common';
-import { BehaviorSubject, combineLatest, filter, map, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, map, Observable, take } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { Schedule } from 'src/app/interfaces/schedule.interface';
 import { 
@@ -149,28 +149,40 @@ export class ScheduleComponent implements OnInit {
     this.closeScheduleModal();
   }
 
-  // ✅ Edit Schedule
   openEditScheduleModal(schedule: Schedule): void {
     this.isEditScheduleModalVisible = true;
+    this.selectedSchedule = null; // Clear previous data
     this.store.dispatch(ScheduleActions.loadScheduleById({ schedule_id: schedule.id }));
-
-    this.selectedSchedule$ = this.store.pipe(select(selectSelectedSchedule));
+  
+    this.selectedSchedule$ = this.store.pipe(
+      select(selectSelectedSchedule),
+      filter(schedule => !!schedule), // Ensure we get a valid schedule
+      take(1) // Automatically unsubscribe after receiving data
+    );
+  
     this.selectedSchedule$.subscribe((loadedSchedule) => {
-      if (loadedSchedule) {
-        this.selectedSchedule = loadedSchedule;
-      }
+      this.selectedSchedule = loadedSchedule;
+      this.cdr.detectChanges(); // Ensure UI updates
     });
   }
+  
 
   handleEditSchedule(schedule: Schedule): void {
+    console.log('Submitting Edited Schedule:', schedule); // Debug #1
+  
     if (schedule.id) {
       this.store.dispatch(ScheduleActions.updateSchedule({ 
         schedule_id: schedule.id, 
         updateSchedule: { ...schedule } 
       }));
+      console.log('Dispatched Update Schedule Action:', schedule.id); // Debug #2
+    } else {
+      console.warn('Schedule ID is missing, update not dispatched!'); // Debug #3
     }
+    
     this.closeScheduleModal();
   }
+  
 
   // ✅ Delete Schedule
   deleteSchedule(): void {
