@@ -16,6 +16,8 @@ import { AlertComponent } from 'src/app/my-components/alert/alert.component';
 import { ConfirmModalComponent } from 'src/app/my-components/modals/confirm-modal/confirm-modal.component';
 import { GeneralModalComponent } from 'src/app/my-components/modals/general-modal/general-modal.component';
 import { decodeAccessToken } from 'src/app/services/auth/auth.utils';
+import { TokenService } from 'src/app/ngrx/schedules/token.service';
+import { DecodeTokenService } from 'src/app/services/auth/decode.token.service';
 
 @Component({
   selector: 'app-schedule-table',
@@ -57,7 +59,12 @@ export class ScheduleComponent implements OnInit {
   itemsPerPage = 10;
   currentPage = 1;
 
-  constructor(private store: Store, private cdr: ChangeDetectorRef) {
+  constructor(
+    private store: Store, 
+    private cdr: ChangeDetectorRef,
+    private tokenService: TokenService,
+    private decodeTokenService: DecodeTokenService
+  ) {
     this.filteredSchedules$ = combineLatest([
       this.schedules$,
       this.searchTerm$,
@@ -98,10 +105,9 @@ export class ScheduleComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const userData = decodeAccessToken();
-    if (userData?.id) {
-      this.dentistId = userData.id;
-      this.store.dispatch(ScheduleActions.loadSchedulesByDentist({ dentistId: this.dentistId }));
+    this.dentistId = this.decodeTokenService.getUserId();
+    if(this.dentistId){
+      this.tokenService.loadSchedulesByDentist(this.dentistId)
     }
   }
 

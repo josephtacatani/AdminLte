@@ -73,24 +73,14 @@ export class AppointmentEffects {
   
 
 
-  // ✅ Create appointment
-
   createAppointment$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AppointmentActions.createAppointment),
-      mergeMap(({ appointment, service_list_id }) =>
-        this.appointmentService.createAppointment(appointment, service_list_id).pipe(
-          mergeMap((response: ApiResponse<{ appointmentId: number }>) => {
-            const userData = decodeAccessToken(); // ✅ Get user ID from JWT
-  
-            return [
-              AppointmentActions.createAppointmentSuccess({ response }),
-              AlertActions.setSuccess({ message: response.message }), // ✅ Show success alert
-              ...(userData?.id 
-                ? [AppointmentActions.loadAppointmentByPatientId({ id: userData.id })] 
-                : []) // ✅ Refresh user's appointments list
-            ];
-          }),
+      mergeMap(({ appointment }) =>
+        this.appointmentService.createAppointment(appointment).pipe(
+          map((response: ApiResponse<{ appointmentId: number }>) =>
+            AppointmentActions.createAppointmentSuccess({ response }) // ✅ Only dispatch success
+          ),
           catchError((error) =>
             of(
               AppointmentActions.createAppointmentFailure({ 
@@ -104,18 +94,25 @@ export class AppointmentEffects {
     )
   );
 
+  
   createAppointmentSuccess$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(AppointmentActions.createAppointmentSuccess),
-    map(({ response }) => {
-      const userData = decodeAccessToken();
-      if (userData?.id) {
-        return AppointmentActions.loadAllAppointmentsByPatientId({ patient_id: userData.id });
-      }
-      return { type: 'NO_ACTION' };
-    })
-  )
-);
+    this.actions$.pipe(
+      ofType(AppointmentActions.createAppointmentSuccess),
+      map(({ response }) => {
+        const userData = decodeAccessToken(); // Extract user details from token
+  
+        if (userData?.role === 'patient') {
+          return AppointmentActions.loadAllAppointmentsByPatientId({ patient_id: userData.id });
+        } else if (userData?.role === 'dentist') {
+          return AppointmentActions.loadAppointments(); // ✅ Load all dentist's appointments
+        }
+  
+        return { type: 'NO_ACTION' }; // Prevents unnecessary actions
+      })
+    )
+  );
+  
+  
   
 
   // ✅ Update appointment
@@ -124,12 +121,18 @@ export class AppointmentEffects {
       ofType(AppointmentActions.updateAppointment),
       mergeMap(({ id, appointment }) =>
         this.appointmentService.updateAppointment(id, appointment).pipe(
-          map((response) => AppointmentActions.updateAppointmentSuccess({ appointment: response.data! })),
-          catchError((error) => of(AppointmentActions.updateAppointmentFailure({ error: error.message })))
+          map((response) => 
+            AppointmentActions.updateAppointmentSuccess({ response }) // ✅ Pass full response
+          ),
+          catchError((error) => 
+            of(AppointmentActions.updateAppointmentFailure({ error: error.message }))
+          )
         )
       )
     )
   );
+  
+  
 
   // ✅ Delete appointment
   deleteAppointment$ = createEffect(() =>

@@ -8,9 +8,11 @@ export const AuthActions = createActionGroup({
     'Login': props<{ loginRequest: LoginRequest }>(),
     'Login Success': props<{ loginResponse: LoginResponse }>(),
     'Login Failure': props<{ loginResponseError: LoginResponseError }>(),
+
     'Refresh Token': props<{ refreshToken: string  }>(),
     'Refresh Token Success': props<{ message: string  }>(),
     'Refresh Token Failure': props<{ error: string }>(), 
+    
     'Logout': props<{ refreshToken: string  }>(),
     'Logout Success': props<{ message: string  }>(),
     'Logout Failure': props<{ error: string }>(), // 

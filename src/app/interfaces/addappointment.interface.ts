@@ -17,6 +17,33 @@ export interface ApiResponse<T> {
     health_declaration_id?: number | null; // Optional if the system fetches it automatically
     service_list_id?: number[]; // ✅ Now Optional (Array of Service IDs)
   }
+
+    // ✅ Appointment Detail Interface
+    export interface AppointmentDetail {
+      id: number; // Appointment ID
+      status: string; // Appointment status
+      appointment_type: string; // Type of appointment
+      patient_fullname: string; // Full name of the patient
+      dentist_fullname: string; // Full name of the dentist
+      schedule: {
+        id: number; // Schedule ID
+        date: string; // Schedule date
+      };
+      timeslot: {
+        id: number; // Timeslot ID
+        start_time: string; // Start time of the appointment
+        end_time: string; // End time of the appointment
+      };
+      services: {
+        id: number; // Service ID
+        service_name: string; // Service name
+        title: string; // Service title
+        content: string; // Service description
+        photo: string; // Service photo URL
+      }[]; // Updated to include additional fields for services
+    }
+
+
   
   // ✅ Appointment Services Interface (Links Appointments to Services)
   export interface AppointmentService {

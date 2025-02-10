@@ -1,1 +1,100 @@
-<p>onlinerequest works!</p>
+<section class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1>{{ pagetitle }}</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item active">{{ pagetitle }}</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <section>
+    <div class="content">
+      <div class="container-fluid">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header">
+              <button class="btn btn-primary" (click)="openAddAppointmentModal()">
+                <i class="fas fa-plus"></i> Add Schedule
+              </button>
+            </div>
+            <div class="card-body">
+              <section>
+                <ng-container *ngIf="$appointments | async as appointments; else loading">
+                  <ng-container *ngIf="appointments.length > 0; else noData">
+                    <app-table-with-edit-delete
+                      [title]="pagetitle + ' List'"
+                      [data]="appointments || []"
+                      [columns]="columns"
+                      [itemsPerPage]="itemsPerPage"
+                      [(currentPage)]="currentPage"
+                      [searchTerm]="searchTerm"
+                      (sort)="sortAppointment($event)"
+                      (currentPageChange)="currentPage = $event"
+                      (searchTermChange)="filterAppointment($event)"
+                      (actionClick)="handleActionClick($event)"
+
+                    ></app-table-with-edit-delete>
+                  </ng-container>
+  
+                  <ng-template #noData>
+                    <p class="no-data-message">No schedules available.</p>
+                  </ng-template>
+                </ng-container>
+  
+                <ng-template #loading>
+                  <p>Loading schedules...</p>
+                </ng-template>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<app-appointment-new-modal
+  [isVisible]="isAddAppointmentModalVisible || isEditAppointmentModalVisible"
+  [title]="isEditAppointmentModalVisible ? 'Edit Schedule' : 'Add Schedule'"
+  [appointmentData]="isEditAppointmentModalVisible ? selectedAppointment : null"
+  (closeModal)="closeAppointmentModal()"
+  (submitModal)="isEditAppointmentModalVisible ? handleEditAppointment($event) : handleAddAppointment($event)"
+></app-appointment-new-modal>
+
+  
+  <!-- Loading Spinner -->
+  <div *ngIf="$loading | async" class="text-center">
+    <p>Loading schedules...</p>
+  </div>
+  
+  <!-- Error Message -->
+  <div *ngIf="$error | async as error" class="alert alert-danger">
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- <app-alert *ngIf="$error | async as error" [error]="error" type="danger"></app-alert> -->
+  
+  <!-- Success Message -->
+  <app-alert *ngIf="$message | async as message" [message]="message" type="success"></app-alert>
+  
+  
+  
+<!-- Confirm Delete Modal -->
+<app-confirm-modal
+  [isVisible]="isConfirmModalVisible"
+  [title]="'Confirm Deletion'"
+  [message]="confirmModalMessage"
+  [confirmText]="'Delete'"
+  [cancelText]="'Cancel'"
+  (closeModal)="isConfirmModalVisible = false"
+  (confirmAction)="handleDeleteAppointment()"
+></app-confirm-modal>
+
+
+  

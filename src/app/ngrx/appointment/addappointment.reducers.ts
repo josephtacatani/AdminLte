@@ -1,15 +1,16 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
-import { Appointment, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
+import { Appointment, AppointmentDetail, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
 import { AppointmentActions } from './addappointment.actions';
+
 
 
 // ✅ Define Appointment State
 export interface AppointmentState {
   isLoading: boolean;
-  appointments: Appointment[];
+  appointments: AppointmentDetail[];
   selectedAppointment: Appointment | null;
   selectedAppointmentPatient: Appointment | null;
-  allAppointments: Appointment[]; // ✅ Stores multiple appointments
+  allAppointments: AppointmentDetail[]; // ✅ Stores multiple appointments
   detailedAppointments: DetailedAppointment[];
   error: string | null;
   message: string | null;
@@ -103,12 +104,7 @@ export const appointmentFeature = createFeature({
       isLoading: true,
       error: null,
     })),
-    on(AppointmentActions.updateAppointmentSuccess, (state, { appointment }) => ({
-      ...state,
-      isLoading: false,
-      selectedAppointment: appointment,
-      error: null,
-    })),
+
     on(AppointmentActions.updateAppointmentFailure, (state, { error }) => ({
       ...state,
       isLoading: false,

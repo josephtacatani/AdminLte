@@ -71,9 +71,16 @@
                     <i class="fas fa-trash"></i> Delete
                 </button>
             </ng-container>       
-              <ng-template #normalCell>
-                {{ row[column.key] }}
+            <ng-template #normalCell>
+              <ng-container *ngIf="column.key === 'services'; else defaultCell">
+                {{ getServiceNames(row.services) }}
+              </ng-container>
+              
+              <ng-template #defaultCell>
+                {{ getNestedValue(row, column.key) }}
               </ng-template>
+            </ng-template>
+            
             </td>
           </tr>
         </tbody>

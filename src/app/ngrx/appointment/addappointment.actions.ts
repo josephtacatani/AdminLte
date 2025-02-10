@@ -1,5 +1,6 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { ApiResponse, Appointment, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
+import { ApiResponse, Appointment, AppointmentDetail, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
+
 
 
 export const AppointmentActions = createActionGroup({
@@ -8,7 +9,7 @@ export const AppointmentActions = createActionGroup({
     
     // ✅ Load all appointments
     'Load Appointments': emptyProps(),
-    'Load Appointments Success': props<{ appointments: Appointment[] }>(),
+    'Load Appointments Success': props<{ appointments: AppointmentDetail[] }>(),
     'Load Appointments Failure': props<{ error: string }>(),
 
     // ✅ Load appointment by ID
@@ -23,13 +24,13 @@ export const AppointmentActions = createActionGroup({
 
 
     // ✅ Create appointment
-    'Create Appointment': props<{ appointment: Partial<Appointment>; service_list_id: number[] }>(),
+    'Create Appointment': props<{ appointment: Partial<Appointment> }>(),
     'Create Appointment Success': props<{ response: ApiResponse<{ appointmentId: number }> }>(),
     'Create Appointment Failure': props<{ response: ApiResponse<null> }>(),
 
     // ✅ Update appointment
     'Update Appointment': props<{ id: number; appointment: Partial<Appointment> }>(),
-    'Update Appointment Success': props<{ appointment: Appointment }>(),
+    'Update Appointment Success': props<{ response: ApiResponse<{appointmentId: number}> }>(),
     'Update Appointment Failure': props<{ error: string }>(),
 
     // ✅ Delete appointment

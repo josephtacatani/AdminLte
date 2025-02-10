@@ -10,7 +10,7 @@ import { selectError, selectPatients, selectSelectedPatient } from 'src/app/ngrx
 import { decodeAccessToken } from 'src/app/services/auth/auth.utils';
 import { PatientsActions } from 'src/app/ngrx/patients/patients.actions';
 import { AddAppointmentModalComponent } from 'src/app/my-components/modals/add-appointment-modal/add-appointment-modal.component';
-import { Appointment, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
+import { Appointment, AppointmentDetail, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
 import { selectAppointments, selectDetailedAppointments, selectSelectedAppointment, selectSelectedAppointmentPatient } from 'src/app/ngrx/appointment/addappointment.reducers';
 import { AppointmentActions } from 'src/app/ngrx/appointment/addappointment.actions';
 import { Dentist } from 'src/app/interfaces/dentist.interface';
@@ -18,6 +18,7 @@ import { Schedule, TimeSlot } from 'src/app/interfaces/schedule.interface';
 import { selectSchedules, selectSelectedSchedule, selectSelectedTimeSlot, selectTimeSlots, selectTimeSlotsById } from 'src/app/ngrx/schedules/schedules.reducers';
 import { selectDentists, selectSelectedDentist } from 'src/app/ngrx/dentist/dentist.reducers';
 import { ConfirmModalComponent } from 'src/app/my-components/modals/confirm-modal/confirm-modal.component';
+
 declare var $: any;
 
 @Component({
@@ -39,7 +40,7 @@ export class DefaultviewComponent implements AfterViewInit, OnInit {
   dentist$: Observable<Dentist | null> = this.store.pipe(select(selectSelectedDentist));
   appointment$ = this.store.pipe(select(selectSelectedAppointment));
   timeslot$ = this.store.pipe(select(selectSelectedTimeSlot));
-  appointmentsAll$: Observable<Appointment[] | null> = this.store.pipe(select(selectAppointments));
+  appointmentsAll$: Observable<AppointmentDetail[] | null> = this.store.pipe(select(selectAppointments));
   detailedAppointments$: Observable<DetailedAppointment[] | null> = this.store.pipe(select(selectDetailedAppointments));
 
   constructor(private store: Store, private router: Router) {

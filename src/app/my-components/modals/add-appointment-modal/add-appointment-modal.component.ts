@@ -142,36 +142,13 @@ export class AddAppointmentModalComponent {
 /** ✅ Submit Appointment */
 submitAppointment(): void {
   if (this.appointmentForm.valid) {
-    // ✅ Get the patient ID from the store
-    this.store.pipe(select(selectSelectedPatient)).subscribe((patient) => {
-      if (patient) {
-        const formValue = this.appointmentForm.getRawValue(); // ✅ Includes disabled fields like `patient_id`
-
-        // ✅ Prepare data for dispatch
-        const appointment: Partial<Appointment> = {
-          patient_id: patient.user_id, // ✅ Add `patient_id`
-          dentist_id: formValue.dentist_id,
-          schedule_id: formValue.schedule_id,
-          timeslot_id: formValue.time, // Assuming 'time' is the timeslot_id
-          status: 'pending', // Default status when creating an appointment
-          appointment_type: 'online', // Adjust if necessary
-        };
-
-        const service_list_id: number[] = formValue.services;
-
-        // ✅ Dispatch Action with `patient_id`
-        this.store.dispatch(
-          AppointmentActions.createAppointment({ appointment, service_list_id })
-        );
-
-        this.submitModal.emit(formValue);
-        this.close();
-      } else {
-        console.warn('No patient data found in store!');
-      }
-    });
+    const formValue = this.appointmentForm.getRawValue();
+    // Just emit the data instead of dispatching the action
+    this.submitModal.emit(formValue);
+    this.close();
   }
 }
+
 
 
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiResponse, Appointment, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
+import { ApiResponse, Appointment, AppointmentDetail, DetailedAppointment } from 'src/app/interfaces/addappointment.interface';
 import { environment } from 'src/environments/environment.prod';
 
 
@@ -16,8 +16,8 @@ export class AppointmentService {
   constructor(private http: HttpClient) {}
 
   // ✅ Get all appointments
-  getAppointments(): Observable<ApiResponse<Appointment[]>> {
-    return this.http.get<ApiResponse<Appointment[]>>(this.apiUrl);
+  getAppointments(): Observable<ApiResponse<AppointmentDetail[]>> {
+    return this.http.get<ApiResponse<AppointmentDetail[]>>(this.apiUrl);
   }
 
   // ✅ Get appointment by ID
@@ -38,20 +38,14 @@ export class AppointmentService {
   }
 
   // ✅ Create a new appointment (Handles Optional `service_list_id`)
-  createAppointment(
-    appointment: Partial<Appointment>, 
-    service_list_id: number[]
-  ): Observable<ApiResponse<{ appointmentId: number }>> {
-    return this.http.post<ApiResponse<{ appointmentId: number }>>(this.apiUrl, { 
-      ...appointment, 
-      service_list_id 
-    });
+  createAppointment(appointment: Partial<Appointment>): Observable<ApiResponse<{ appointmentId: number }>> {
+    return this.http.post<ApiResponse<{ appointmentId: number }>>(this.apiUrl, appointment);
   }
 
-  // ✅ Update an appointment (Handles Optional `service_list_id`)
-  updateAppointment(id: number, appointment: Partial<Appointment>): Observable<ApiResponse<Appointment>> {
-    return this.http.put<ApiResponse<Appointment>>(`${this.apiUrl}/${id}`, appointment);
+  updateAppointment(id: number, appointment: Partial<Appointment>): Observable<ApiResponse<{ appointmentId: number }>> {
+    return this.http.put<ApiResponse<{ appointmentId: number }>>(`${this.apiUrl}/${id}`, appointment);
   }
+  
 
   // ✅ Delete an appointment
   deleteAppointment(id: number): Observable<ApiResponse<{ id: number }>> {

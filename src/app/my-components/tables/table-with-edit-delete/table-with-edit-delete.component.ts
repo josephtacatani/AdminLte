@@ -38,4 +38,16 @@ export class TableWithEditDeleteComponent {
       this.itemsPerPageChange.emit(this.itemsPerPage);
       this.searchTermChange.emit(this.searchTerm);
     }
+
+    getNestedValue(obj: any, key: string): any {
+      return key.split('.').reduce((acc, part) => acc && acc[part], obj) || '-';
+    }
+
+    getServiceNames(services: any[]): string {
+      return services && services.length > 0
+        ? services.map(service => service.service_name).join(', ')
+        : 'No Services';
+    }
+    
+    
 }
