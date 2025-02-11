@@ -38,6 +38,7 @@ export class AppointmentNewModalComponent implements OnInit, OnChanges {
   dentists$!: Observable<Dentist[]>;
   patient$!: Observable<Patient[]>;
   schedules$!: Observable<Schedule[]>; // Filtered schedules based on selected dentist
+  loadSchedules$!: Observable<Schedule[]>;
   isLoading$!: Observable<boolean>;
   timeSlots$!: Observable<TimeSlot[]>;
   message$!: Observable<string | null>;
@@ -61,6 +62,7 @@ export class AppointmentNewModalComponent implements OnInit, OnChanges {
     this.initForm();
     this.loadDentists();
     this.loadPatient();
+    this.loadSchedules();
     this.setupDentistSelection();
     this.setupScheduleSelection();
     this.loadServices(); // Load services from the store
@@ -79,14 +81,29 @@ export class AppointmentNewModalComponent implements OnInit, OnChanges {
    * update the form values accordingly.
    */
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['appointmentData'] && !changes['appointmentData'].firstChange) {
-      if (this.appointmentData) {
-        this.patchFormData(this.appointmentData);
-      } else {
-        this.appointmentForm.reset();
+    if (changes['appointmentData'] && changes['appointmentData'].currentValue) {
+      const appointment = this.appointmentData!;
+      console.log("🛠️ Editing Appointment - Received Data:", appointment);
+  
+      // ✅ Populate Form Fields
+      this.patchFormData(appointment);
+  
+      // ✅ Automatically Fetch Schedules Based on Existing Dentist ID (Override Default)
+      if (appointment.dentist_id) {
+        console.log("📅 Fetching schedules for dentist:", appointment.dentist_id);
+        this.store.dispatch(ScheduleActions.loadSchedulesByDentist({ dentistId: appointment.dentist_id }));
+      }
+  
+      // ✅ Automatically Fetch Time Slots Based on Existing Schedule ID (Override Default)
+      if (appointment.schedule_id) {
+        console.log("⏳ Fetching time slots for schedule:", appointment.schedule_id);
+        this.store.dispatch(ScheduleActions.loadTimeSlots({ scheduleId: appointment.schedule_id }));
       }
     }
+    
   }
+  
+  
   
 
   /**
@@ -130,6 +147,11 @@ export class AppointmentNewModalComponent implements OnInit, OnChanges {
     this.store.dispatch(DentistActions.loadDentists());
   }
 
+  private loadSchedules():void{
+    this.loadSchedules$ = this.store.pipe(select(selectSchedules));
+    this.store.dispatch(ScheduleActions.loadSchedules());
+  }
+
   private loadPatient(): void {
     this.patient$ = this.store.pipe(select(selectPatients));
     this.store.dispatch(PatientsActions.loadPatients());
@@ -144,47 +166,58 @@ export class AppointmentNewModalComponent implements OnInit, OnChanges {
   /** Detect Dentist Selection & Fetch Available Dates */
   private setupDentistSelection(): void {
     this.schedules$ = this.appointmentForm.get('dentist_id')!.valueChanges.pipe(
-      distinctUntilChanged(), // Prevent duplicate API calls
-      tap(() => {
-        this.appointmentForm.patchValue({ schedule_id: '', timeslot_id: '' }); // Reset schedule and timeslot when changing dentist
-      }),
+      distinctUntilChanged(),
       tap((dentistId) => {
+        console.log("🦷 Selected Dentist ID:", dentistId);
+  
+        // ✅ If editing, ignore unless user manually changes the dentist
+        if (this.appointmentData && dentistId === this.appointmentData.dentist_id) {
+          console.log("✅ Editing: Using existing schedule, skipping API call.");
+          return;
+        }
+  
+        // ✅ Reset schedule and time slot
+        this.appointmentForm.patchValue({ schedule_id: '', timeslot_id: '' });
+  
+        // ✅ Fetch schedules for new dentist selection
         if (dentistId) {
           this.store.dispatch(ScheduleActions.loadSchedulesByDentist({ dentistId }));
         }
       }),
-      switchMap(() => this.store.pipe(select(selectSchedulesByDentistId))),
-      map((schedules) =>
-        schedules.map((schedule) => ({
-          ...schedule,
-          date: formatDate(schedule.date, 'yyyy-MM-dd', 'en-US'), // Format date
-        }))
-      )
+      switchMap(() => this.store.pipe(select(selectSchedulesByDentistId)))
     );
-
-    this.schedules$.subscribe(slots => console.log('Schedule:', slots));
-
-    this.isLoading$ = this.store.pipe(
-      select(selectIsLoading),
-      map((isLoading) => isLoading ?? false) // Convert null to false
-    );
+  
+    this.schedules$.subscribe(schedules => console.log("📅 Loaded Schedules:", schedules));
   }
-
+  
+  
   /** Detect Schedule Selection & Fetch Available Time Slots */
   private setupScheduleSelection(): void {
     this.timeSlots$ = this.appointmentForm.get('schedule_id')!.valueChanges.pipe(
-      distinctUntilChanged(), // Prevent duplicate API calls
-      tap(() => this.appointmentForm.patchValue({ timeslot_id: '' })), // Reset timeslot when changing schedule
+      distinctUntilChanged(),
       tap((scheduleId) => {
+        console.log("📅 Selected Schedule ID:", scheduleId);
+  
+        // ✅ If editing, ignore unless user manually changes the schedule
+        if (this.appointmentData && scheduleId === this.appointmentData.schedule_id) {
+          console.log("✅ Editing: Using existing time slot, skipping API call.");
+          return;
+        }
+  
+        // ✅ Reset time slot
+        this.appointmentForm.patchValue({ timeslot_id: '' });
+  
+        // ✅ Fetch time slots for new schedule selection
         if (scheduleId) {
           this.store.dispatch(ScheduleActions.loadTimeSlots({ scheduleId }));
         }
       }),
       switchMap(() => this.store.pipe(select(selectTimeSlots)))
     );
-
-    this.timeSlots$.subscribe(slots => console.log('Time Slots:', slots));
+  
+    this.timeSlots$.subscribe(timeSlots => console.log("⏳ Loaded Time Slots:", timeSlots));
   }
+  
 
   /** Close Modal */
   close(): void {

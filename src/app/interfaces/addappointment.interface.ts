@@ -25,6 +25,15 @@ export interface ApiResponse<T> {
       appointment_type: string; // Type of appointment
       patient_fullname: string; // Full name of the patient
       dentist_fullname: string; // Full name of the dentist
+      patient:{
+        id: number,
+        fullname: string
+      };
+      dentist:{
+        id: number,
+        fullname: string
+      };
+
       schedule: {
         id: number; // Schedule ID
         date: string; // Schedule date
@@ -49,6 +58,11 @@ export interface ApiResponse<T> {
   export interface AppointmentService {
     appointment_id: number;
     service_list_id: number;
+  }
+
+  interface Service {
+    id: number;
+    name: string;
   }
   
 

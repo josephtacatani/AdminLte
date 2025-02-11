@@ -7,6 +7,8 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Appointment, AppointmentDetail } from 'src/app/interfaces/addappointment.interface';
 import { AlertComponent } from 'src/app/my-components/alert/alert.component';
 import { AppointmentNewModalComponent } from "../../../my-components/modals/appointment-new-modal/appointment.new.modal";
+import { selectAppointments } from 'src/app/ngrx/appointment/addappointment.reducers';
+import { Service } from 'src/app/interfaces/servicelist.interface';
 
 @Component({
   selector: 'app-onlinerequest',
@@ -40,8 +42,8 @@ export class OnlinerequestComponent implements OnInit {
   constructor(private readonly sandbox: AppointmentSandBox) {}
 
   columns = [
-    { key: 'patient_fullname', label: 'Patient', sortable: true },
-    { key: 'dentist_fullname', label: 'Dentist', sortable: true },
+    { key: 'patient.fullname', label: 'Patient', sortable: true },
+    { key: 'dentist.fullname', label: 'Dentist', sortable: true },
     { key: 'services', label: 'Service Availed', sortable: true },
     { key: 'timeslot.start_time', label: 'Start Time', sortable: true },
     { key: 'timeslot.end_time', label: 'End Time', sortable: true },
@@ -74,26 +76,43 @@ export class OnlinerequestComponent implements OnInit {
   handleActionClick(event: { action: string; row: Appointment }): void {
     const { action, row } = event;
     
-    console.log("🛠️ Action Clicked:", action, row); // Debugging
+
   
     if (action === 'edit') {
       this.handleEditAppointment(row);
     } else if (action === 'delete') {
       this.selectedAppointment = row;
       this.isConfirmModalVisible = true;
-      console.log("🗑️ Delete Clicked - Selected Appointment:", this.selectedAppointment); // Debugging
+
     }
   }
   
 
   /** ✅ Open Edit Modal and Patch Data */
-  handleEditAppointment(appointment: Appointment): void {
+  handleEditAppointment(appointment: any): void {
     if (!appointment.id) {
       console.error("🚨 Appointment ID is missing. Cannot edit.");
       return;
     }
-    this.selectedAppointment = appointment; // ✅ Store appointment in component state
-    this.isEditAppointmentModalVisible = true; // ✅ Open edit modal
+  
+    // ✅ Remap values
+    const mappedAppointment = {
+      id: appointment.id,
+      status: appointment.status,
+      appointment_type: appointment.appointment_type,
+      patient_id: appointment.patient?.id || '',  // Default to 1 if undefined
+      dentist_id: appointment.dentist?.id || '',
+      schedule_id: appointment.schedule?.id || '',
+      timeslot_id: appointment.timeslot?.id || '',
+      service_list_id: appointment.services ? appointment.services.map((s: Service) => s.id) : [],
+
+    };
+  
+    console.log("🔹 Remapped Appointment Data:", mappedAppointment); // Debugging
+  
+    // ✅ Send remapped data to modal
+    this.selectedAppointment = mappedAppointment;
+    this.isEditAppointmentModalVisible = true;
   }
 
   /** ✅ Handle Confirm Delete */
@@ -130,7 +149,7 @@ export class OnlinerequestComponent implements OnInit {
     console.log("✏️ Updating Appointment:", appointment);
   
     if (!appointment || !appointment.id) {
-      console.error("🚨 Invalid appointment data for update.");
+
       return;
     }
 
